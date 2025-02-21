@@ -21,7 +21,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
+      uses: oven-sh/setup-bun@v2
 
     - name: Install Dependencies
       run: bun install
@@ -73,7 +73,7 @@ jobs:
         git diff --quiet && echo "No formatting changes." && exit 0
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git commit -am "chore: auto-format code"
+        git commit -am "style: auto-format code"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
