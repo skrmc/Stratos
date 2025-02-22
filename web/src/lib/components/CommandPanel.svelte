@@ -5,7 +5,6 @@
   import { get } from 'svelte/store'
 
   async function submitCommand() {
-
     const endpoint = `${get(apiEndpoint)}/submit`
     const response = await fetch(endpoint, {
       method: 'POST',
