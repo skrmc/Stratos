@@ -28,9 +28,25 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      ai:
+        condition: service_started
+    environment:
+       - AI_URL=http://ai:5001
     volumes:
       - ./logs:/app/logs 
       - ./uploads:/app/uploads
 
+  ai:
+    container_name: stratos-ai
+    build:
+      context: ../ai
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - ../ai/uploads:/app/ai/uploads
+      - ../ai/models:/app/ai/models
+    restart: always
+    
 volumes:
   postgres_data:

@@ -19,10 +19,10 @@ const api = new Hono()
 api.route('/auth', auth)
 api.route('/uploads', uploads)
 api.route('/status', status)
-api.route('/ai', ai)
 
 app.route('/api', api)
 app.route('/auth', auth)
+app.route('/ai', ai)
 
 //this route is only defined in dev env. not part of the actual application
 if (process.env.NODE_ENV === 'development') {
