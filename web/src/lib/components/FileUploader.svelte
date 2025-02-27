@@ -62,6 +62,7 @@
     formData.append('file', file)
     formData.append('id', id)
     const token = 'AUTH_TOKEN_PLACEHOLDER'
+
     return new Promise<void>((resolve, reject) => {
       const xhr = new XMLHttpRequest()
       xhr.open('POST', path)
@@ -77,24 +78,20 @@
       }
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
+          let responseData
           try {
-            const responseData = JSON.parse(xhr.responseText)
-            if (responseData.success) {
-              files.update((current) =>
-                current.map((f) =>
-                  f.id === id ? { ...f, progress: 100, uploaded: true } : f,
-                ),
-              )
-              resolve()
-            } else {
-              reject(xhr.response)
-            }
-          } catch (error) {
-            reject(xhr.response)
+            responseData = JSON.parse(xhr.responseText)
+          } catch {
+            return reject(xhr.response)
           }
-        } else {
-          reject(xhr.response)
+          if (responseData.success) {
+            files.update((current) =>
+              current.map((f) => (f.id === id ? { ...f, progress: 100, uploaded: true } : f)),
+            )
+            return resolve()
+          }
         }
+        return reject(xhr.response)
       }
       xhr.onerror = () => {
         reject(xhr.response)
@@ -146,7 +143,9 @@
 <button
   type="button"
   on:click={() => fileInput.click()}
-  class="border-mild flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-6 transition-colors duration-300 {dropActive ? 'border-primary/50 bg-primary/20' : 'bg-transparent'}"
+  class="border-mild flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-6 transition-colors duration-300 {dropActive
+    ? 'border-primary/50 bg-primary/20'
+    : 'bg-transparent'}"
 >
   <span class="material-icons text-dark/50 mb-2" style="font-size: 2rem;">attach_file</span>
   <p class="text-dark/70 text-center">Drag & drop files or click here</p>
