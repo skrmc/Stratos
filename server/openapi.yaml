@@ -1,48 +1,36 @@
 openapi: 3.0.0
 info:
   title: Stratos Video Processing API
-  description: API for the Stratos web-based video processing platform
+  description: API for the Stratos web-based ffmpeg processing platform
   version: '1.0.0'
   contact:
-    name: Stratos Team
+    name: Stratos Repo
     url: https://github.com/StratosIO/Stratos
-
 servers:
-  - url: http://localhost:3000/api/v1
-    description: Development server
+  - url: /api
+    description: Base API path
 
 components:
   securitySchemes:
-    BearerAuth:
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
+  
   schemas:
     Error:
       type: object
-      required:
-        - code
-        - message
       properties:
-        code:
+        error:
           type: string
-          enum:
-            - INVALID_INPUT
-            - PROCESSING_FAILED
-            - INVALID_CREDENTIALS
-            - USER_EXISTS
-            - SERVER_ERROR
-            - NOT_FOUND
-        message:
-          type: string
-          description: Detailed error message
-
+          description: Error message
+    
     User:
       type: object
       properties:
         id:
-          type: integer
+          type: string
+          format: uuid
         username:
           type: string
         email:
@@ -51,18 +39,181 @@ components:
         role:
           type: string
           enum: [user, admin]
-        created_at:
+    
+    LoginCredentials:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
           type: string
-          format: date-time
-
-    UserResponse:
+          format: email
+        password:
+          type: string
+          format: password
+    
+    RegisterCredentials:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    
+    AuthResponse:
       type: object
       properties:
         user:
           $ref: '#/components/schemas/User'
         token:
           type: string
-          description: JWT token for authentication
+    
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        result_path:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskFile'
+          nullable: true
+    
+    TaskFile:
+      type: object
+      properties:
+        filename:
+          type: string
+        download_url:
+          type: string
+        size:
+          type: integer
+        mime_type:
+          type: string
+    
+    CommandSubmission:
+      type: object
+      required:
+        - command
+      properties:
+        command:
+          type: string
+          description: Command string to execute
+        type:
+          type: string
+          default: ffmpeg
+          description: Type of command (ffmpeg by default)
+    
+    CommandResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        task:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            status:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+    
+    TaskStatusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        task:
+          $ref: '#/components/schemas/Task'
+    
+    FileUpload:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            file_name:
+              type: string
+            file_path:
+              type: string
+        fileInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+            size:
+              type: integer
+            id:
+              type: string
+              format: uuid
+    
+    FileList:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              file_name:
+                type: string
+              file_size:
+                type: integer
+              mime_type:
+                type: string
+              uploaded_at:
+                type: string
+                format: date-time
+              file_path:
+                type: string
+        pagination:
+          type: object
+          properties:
+            next_cursor:
+              type: string
+              nullable: true
+            has_more:
+              type: boolean
 
 paths:
   /auth/register:
@@ -75,38 +226,24 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - username
-                - email
-                - password
-              properties:
-                username:
-                  type: string
-                  minLength: 3
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  minLength: 8
+              $ref: '#/components/schemas/RegisterCredentials'
       responses:
-        '201':
-          description: User created successfully
+        '200':
+          description: Registration successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
-        '400':
-          description: Invalid input or user exists
+                $ref: '#/components/schemas/AuthResponse'
+        '500':
+          description: Registration failed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  
   /auth/login:
     post:
-      summary: Authenticate user
+      summary: Login with existing credentials
       tags:
         - Authentication
       requestBody:
@@ -114,38 +251,26 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
+              $ref: '#/components/schemas/LoginCredentials'
       responses:
         '200':
           description: Login successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
-        '401':
-          description: Invalid credentials
+                $ref: '#/components/schemas/AuthResponse'
+        '500':
+          description: Login failed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  
   /uploads:
     post:
-      summary: Upload a new file
-      description: Upload a file for processing
+      summary: Upload a file
       tags:
-        - Uploads
-      security:
-        - BearerAuth: []
+        - File Uploads
       requestBody:
         required: true
         content:
@@ -154,161 +279,87 @@ paths:
               type: object
               required:
                 - file
-                - uuid
+                - id
               properties:
                 file:
                   type: string
                   format: binary
-                  description: The file to upload
+                  description: File to upload
                 id:
                   type: string
                   format: uuid
-                  description: Unique identifier for the upload
+                  description: Unique ID for the file
       responses:
-        '201':
+        '200':
           description: File uploaded successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        format: uuid
-                        example: "123e4567-e89b-12d3-a456-426614174000"
-                      file_name:
-                        type: string
-                        example: "processed_video.mp4"
-                      file_path:
-                        type: string
-                        example: "/uploads/processed_video.mp4"
-                  fileInfo:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        example: "example.mp4"
-                      type:
-                        type: string
-                        example: "video/mp4"
-                      size:
-                        type: number
-                        example: 1048576
+                $ref: '#/components/schemas/FileUpload'
         '400':
-          description: Invalid input - No file provided or invalid file type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized - Invalid or missing token
+          description: Invalid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Server error during upload
+          description: Server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    
     get:
-      summary: List uploads
-      description: Get a paginated list of uploaded files
+      summary: List uploaded files
       tags:
-        - Uploads
-      security:
-        - BearerAuth: []
+        - File Uploads
       parameters:
         - name: limit
           in: query
-          description: Maximum number of uploads to return
           required: false
           schema:
             type: integer
             minimum: 1
-            maximum: 100
-            default: 10
+          description: Maximum number of files to return
         - name: cursor
           in: query
-          description: Base64 encoded cursor for pagination
           required: false
           schema:
             type: string
+          description: Pagination cursor for fetching next page
       responses:
         '200':
-          description: List of uploads retrieved successfully
+          description: List of files
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          format: uuid
-                        file_name:
-                          type: string
-                        file_size:
-                          type: number
-                        mime_type:
-                          type: string
-                        uploaded_at:
-                          type: string
-                          format: date-time
-                        file_path:
-                          type: string
-                  pagination:
-                    type: object
-                    properties:
-                      next_cursor:
-                        type: string
-                        description: Base64 encoded cursor for next page
-                        nullable: true
-                      has_more:
-                        type: boolean
-                        description: Indicates if more uploads are available
-        '401':
-          description: Unauthorized - Invalid or missing token
+                $ref: '#/components/schemas/FileList'
+        '400':
+          description: Invalid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Server error while fetching uploads
+          description: Server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  
   /uploads/{id}:
     delete:
       summary: Delete a file
-      description: Delete a file uploaded
       tags:
-        - Uploads
-      security:
-        - BearerAuth: []
+        - File Uploads
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID of the file to delete
           schema:
             type: string
             format: uuid
+          description: ID of the file to delete
       responses:
         '200':
           description: File deleted successfully
@@ -319,27 +370,126 @@ paths:
                 properties:
                   success:
                     type: boolean
-                    example: true
         '400':
-          description: Invalid UUID format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: File not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized - Invalid or missing token
+          description: Invalid ID
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Server error during deletion
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /tasks:
+    post:
+      summary: Submit a command for processing
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandSubmission'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+        '400':
+          description: Invalid command
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /tasks/{id}:
+    get:
+      summary: Get task details including output files
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the task
+      responses:
+        '200':
+          description: Task details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /tasks/{id}/status:
+    get:
+      summary: Get task status
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the task
+      responses:
+        '200':
+          description: Task status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatusResponse'
+        '400':
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
           content:
             application/json:
               schema:
