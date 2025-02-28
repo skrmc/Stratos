@@ -9,7 +9,7 @@ services:
       retries: 4
     environment:
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass 
+      POSTGRES_PASSWORD: pass
       POSTGRES_DB: stratos
     ports:
       - "5432:5432"
@@ -21,7 +21,7 @@ services:
     container_name: stratos-server
     image: localhost/stratos:dev
     build:
-      context: . 
+      context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"

@@ -31,11 +31,11 @@ docker compose up -d
 
 3. Stop the services:
 ```bash
-#Stop containers
+# Stop containers
 docker compose down
 
-#Stop containers and remove volumes(this will delete all data in the db)
-docker compose down -v
+# WARNING: This deletes all data!
+rm -rf uploads/ outputs/ postgres/
 ```
 
 ### Manual Setup
@@ -74,12 +74,12 @@ Create a `.env` file in the project root with the following variables:
 
 ```env
 DB_USER=user
-DB_HOST=db
+DB_HOST=database
 DB_NAME=stratos
 DB_PASSWORD=pass
 DB_PORT=5432
 NODE_ENV=development
-LOG_LEVEL='debug'
+LOG_LEVEL=debug
 ```
 
 ## License

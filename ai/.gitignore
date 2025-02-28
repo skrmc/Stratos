@@ -12,7 +12,6 @@ logs/
 
 # Ignore virtual environments
 venv/
-.env/
 *.venv
 
 # Ignore Docker-related files If needed

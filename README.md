@@ -35,7 +35,8 @@ powershell -c "irm bun.sh/install.ps1|iex"
 
    ```bash
    git clone 
-   cd stratos/backend
+   # cd stratos/server
+   # cd stratos/web
    ```
 
 2. Install dependencies using Bun:
