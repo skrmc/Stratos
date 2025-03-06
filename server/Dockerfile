@@ -11,10 +11,9 @@ RUN wget -q https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun
     && unzip -j bun-${target}.zip -d /usr/local/bin && rm bun-${target}.zip \
     && chmod +x /usr/local/bin/bun
 
-COPY package.json bun.lock .
+COPY package.json bun.lock .env .
 RUN bun install
 
-COPY .env .env
 COPY src src
 
 EXPOSE 3000
