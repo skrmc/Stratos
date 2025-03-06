@@ -49,9 +49,9 @@ export interface ListResult {
 
 // Task list result type
 export interface TaskListResult {
-  tasks: (Task & { fileIds?: string[] })[];
-  nextCursor: string | null;
-  hasMore: boolean;
+  tasks: (Task & { fileIds?: string[] })[]
+  nextCursor: string | null
+  hasMore: boolean
 }
 
 export interface Task {
@@ -108,7 +108,6 @@ export interface TaskFilesResult {
   single: TaskFile | null
   error?: string
 }
-
 
 export interface TaskFileDownloadInfo {
   filename: string

@@ -206,7 +206,7 @@ export const taskController = {
 
     try {
       const deleted = await taskService.deleteTask(taskId)
-      
+
       if (!deleted) {
         log.warn('Task not found for deletion', { taskId })
         return c.json({ error: 'Task not found' }, 404)
@@ -254,6 +254,5 @@ export const taskController = {
       log.error('Failed to list tasks', { error: String(error) })
       return c.json({ error: 'Failed to fetch tasks' }, 500)
     }
-  }
+  },
 }
-

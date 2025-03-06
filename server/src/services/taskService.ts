@@ -7,7 +7,14 @@ import { promisify } from 'util'
 import path from 'path'
 import fs from 'fs/promises'
 import { OUTPUT_CONFIG } from '../types/index.js'
-import type { CommandValidationResult, Task, TaskFile, TaskFilesResult, ListOptions, TaskListResult } from '../types/index.js'
+import type {
+  CommandValidationResult,
+  Task,
+  TaskFile,
+  TaskFilesResult,
+  ListOptions,
+  TaskListResult,
+} from '../types/index.js'
 import { getContentType } from '../utils/fileUtils.js'
 
 const execAsync = promisify(exec)
@@ -324,8 +331,8 @@ export const taskService = {
           FROM task_files
           WHERE task_id = ${task.id}
         `
-        const fileIds = fileAssociations.map(association => association.file_id)
-        
+        const fileIds = fileAssociations.map((association) => association.file_id)
+
         // Ensure we keep all Task properties and add fileIds
         return {
           id: task.id,
@@ -335,9 +342,9 @@ export const taskService = {
           updated_at: task.updated_at,
           result_path: task.result_path,
           error: task.error,
-          fileIds
+          fileIds,
         } as Task & { fileIds: string[] }
-      })
+      }),
     )
 
     return {
@@ -345,5 +352,5 @@ export const taskService = {
       nextCursor,
       hasMore,
     }
-  }
+  },
 }
