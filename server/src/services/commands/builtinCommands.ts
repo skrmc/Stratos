@@ -71,7 +71,7 @@ export const BUILTIN_COMMANDS: Record<string, BuiltinCommandDefinition> = {
       if (format === 'mp4') {
         return `ffmpeg -i ${input} -c:v libx264 -crf ${quality} ${resolution} -preset medium -c:a aac -b:a 128k output.mp4`
       } else if (format === 'mov') {
-        return `ffmpeg -i ${input} -c:v prores -profile:v 3 ${resolution} -c:a pcm_s16le output.mov`
+        return `ffmpeg -i ${input} -c:v libx264 -crf ${quality} ${resolution} -preset medium -c:a aac -b:a 128k output.mov`
       } else if (format === 'webm') {
         return `ffmpeg -i ${input} -c:v libvpx-vp9 -crf ${quality} ${resolution} -b:v 0 -c:a libopus output.webm`
       }
