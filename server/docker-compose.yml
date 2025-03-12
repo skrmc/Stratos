@@ -1,3 +1,4 @@
+# FULL DOCKER-COMPOSE-FILE
 services:
   database:
     image: docker.io/postgres:latest
@@ -28,7 +29,61 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      ai:
+        condition: service_started
+    environment:
+      - AI_URL=http://ai:5001
     volumes:
       - ./logs:/app/logs
-      - ./uploads:/app/uploads
-      - ./outputs:/app/outputs
+      - uploads:/app/uploads
+      - outputs:/app/outputs
+  
+  ai:
+    container_name: stratos-ai
+    build:
+      context: ../ai
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - uploads:/app/uploads
+      - outputs:/app/outputs
+    restart: always
+
+volumes:
+  uploads:
+  outputs:
+# services:
+#   database:
+#     image: docker.io/postgres:latest
+#     container_name: stratos-database
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U user -d stratos"]
+#       interval: 3s
+#       timeout: 3s
+#       retries: 4
+#     environment:
+#       POSTGRES_USER: user
+#       POSTGRES_PASSWORD: pass
+#       POSTGRES_DB: stratos
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - ./postgres:/var/lib/postgresql/data
+#       - ./src/config/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+#   backend:
+#     container_name: stratos-server
+#     image: localhost/stratos:dev
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       database:
+#         condition: service_healthy
+#     volumes:
+#       - ./logs:/app/logs
+#       - ./uploads:/app/uploads
+#       - ./outputs:/app/outputs
