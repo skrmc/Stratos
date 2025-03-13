@@ -32,7 +32,7 @@
 				{$file.icon}
 			</span>
 		</div>
-		<div class="text-base-content/70 truncate select-text">
+		<div class="text-base-content/70 w-0 max-w-full flex-1 truncate select-text">
 			<p class="text-base-content truncate text-lg font-medium">{$file.file.name}</p>
 			<p class="truncate text-sm">
 				Size: {formatBytes($file.file.size)}
