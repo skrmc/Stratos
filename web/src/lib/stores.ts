@@ -51,4 +51,5 @@ export const slashCommands: string[] = [
 	'create-gif',
 	'compress-video',
 	'trim-video',
+	'ai-transcribe',
 ]
