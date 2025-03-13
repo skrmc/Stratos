@@ -6,8 +6,12 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 import { OUTPUT_CONFIG } from '../../types/index.js'
 import type { ParsedCommand } from '../../types/index.js'
+import axios from 'axios'
+import FormData from 'form-data'
+import { readFileSync } from 'fs'
 
 const execAsync = promisify(exec)
+const AI_URL = process.env.AI_URL || 'http://ai:5001'
 
 export const aiService = {
   /**
@@ -83,7 +87,6 @@ export const aiService = {
 
 /**
  * Process a transcription task
- * 1. Extract audio from video file
  */
 async function processTranscription(
   inputFile: { file_path: string; file_name: string; mime_type: string },
@@ -114,13 +117,49 @@ async function processTranscription(
   const transcriptionPath = path.join(outputDir, transcriptionFile)
 
   try {
-    // Call the external AI service
-    // This is a placeholder for the actual service call
-
-    // Save the transcription result
-    // This is a placeholder for the actual transcription saving logic
-
+    // Call the external AI service for transcription
+    const transcriptionResult = await sendToAIService('transcribe', audioPath, {
+      language,
+      format
+    })
+    
+    // Handle the response and save the transcription result
+    let contentToSave = '';
+    
+    // Determine what to save based on the response structure and requested format
+    if (typeof transcriptionResult === 'string') {
+      // If the service returned a plain string
+      contentToSave = transcriptionResult;
+    } else if (transcriptionResult && typeof transcriptionResult === 'object') {
+      // If service returned an object, try to find the text content
+      if (format === 'txt' && transcriptionResult.text) {
+        contentToSave = transcriptionResult.text;
+      } else if ((format === 'srt' || format === 'vtt') && transcriptionResult.subtitle) {
+        contentToSave = transcriptionResult.subtitle;
+      } else if (transcriptionResult.transcription) {
+        // Common alternative property name
+        contentToSave = transcriptionResult.transcription;
+      } else {
+        // Fallback: save the entire response as JSON
+        contentToSave = JSON.stringify(transcriptionResult, null, 2);
+      }
+    } else {
+      // If we got something unexpected, save an error message
+      contentToSave = `Error: Received unexpected response from transcription service: ${transcriptionResult}`;
+    }
+    
+    // Write the content to the output file
+    await fs.writeFile(transcriptionPath, contentToSave, 'utf8')
     log.info(`Transcription saved at ${transcriptionPath}`)
+    
+    // Clean up: Delete the temporary audio file since we don't need it anymore
+    try {
+      await fs.unlink(audioPath)
+      log.info(`Cleaned up temporary audio file: ${audioPath}`)
+    } catch (cleanupError) {
+      // Don't fail the whole operation if cleanup fails
+      log.warn(`Failed to clean up audio file ${audioPath}: ${cleanupError}`)
+    }
   } catch (error) {
     log.error(`Failed to get transcription from AI service: ${error}`)
 
@@ -139,14 +178,47 @@ async function processTranscription(
 }
 
 /**
- * Call AI service
+ * Send audio file to AI service
  */
+async function sendToAIService(
+  jobName: string, 
+  filePath: string,
+  options: Record<string, string | number | boolean> = {}
+) {
+  const formData = new FormData()
+  formData.append('audio', readFileSync(filePath), { filename: path.basename(filePath) })
+  
+  // Add any options as form fields
+  Object.entries(options).forEach(([key, value]) => {
+    formData.append(key, String(value))
+  })
+
+  try {
+    log.info(`Sending file to AI service: ${jobName} with ${filePath}`)
+    const response = await axios.post(`${AI_URL}/${jobName}`, formData, {
+      headers: { ...formData.getHeaders() },
+    })
+    
+    // Log what we received for debugging
+    log.info(`Received response from AI service: ${typeof response.data}`)
+    
+    if (typeof response.data === 'object') {
+      // Log a sample of the response object's keys
+      log.info(`Response keys: ${Object.keys(response.data).join(', ')}`)
+    }
+    
+    return response.data
+  } catch (error) {
+    log.error(`[ERROR] Failed AI job: ${jobName}`, error)
+    throw new Error('AI processing failed.')
+  }
+}
 
 /**
  * Extract audio from a video file using FFmpeg
  */
 async function extractAudio(videoPath: string, outputPath: string): Promise<void> {
-  const command = `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame -q:a 2 "${outputPath}"`
+  const command = `ffmpeg -i "${videoPath}" -vn -acodec pcm_s16le -ar 16000 -ac 1 "${outputPath}"`
 
   try {
     await execAsync(command)
