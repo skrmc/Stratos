@@ -1,13 +1,15 @@
-FROM python:3.9
+FROM python:3.9-alpine
 
 WORKDIR /app
 
-# Install Dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install system dependencies
+RUN apk update && apk add --no-cache build-base cmake git ffmpeg
+
 # Install Whisper.cpp
-RUN apt-get update && apt-get install -y build-essential cmake git wget ffmpeg
 RUN git clone https://github.com/ggerganov/whisper.cpp.git
 WORKDIR /app/whisper.cpp
 RUN make
