@@ -11,7 +11,7 @@
 
 <h2 class="mb-2 text-xl font-bold md:text-2xl">Task Details</h2>
 {#if $task}
-	<div class="border-base-300 bg-base-100 rounded-field flex flex-col gap-4 border-2 p-4">
+	<div class="border-base-300 bg-base-100 rounded-field flex items-center border-2 p-4">
 		<div class="text-base-content/70 w-0 max-w-full flex-1 truncate select-text">
 			<p class="truncate text-lg text-sm font-medium">
 				UUID: <span class="font-mono">{$task.id}</span>
