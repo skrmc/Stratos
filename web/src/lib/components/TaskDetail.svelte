@@ -12,7 +12,7 @@
 <h2 class="mb-2 text-xl font-bold md:text-2xl">Task Details</h2>
 {#if $task}
 	<div class="border-base-300 bg-base-100 rounded-field flex flex-col gap-4 border-2 p-4">
-		<div class="text-base-content/70 truncate select-text">
+		<div class="text-base-content/70 w-0 max-w-full flex-1 truncate select-text">
 			<p class="truncate text-lg text-sm font-medium">
 				UUID: <span class="font-mono">{$task.id}</span>
 			</p>
@@ -28,7 +28,7 @@
 				<p class="truncate text-sm">Result Path: {$task.result_path}</p>
 				<p class="truncate text-sm">
 					Download Link:
-					<a href="{$endpoint}/tasks/{$task.id}" target="_blank" class="text-primary-content">
+					<a href="{$endpoint}/tasks/{$task.id}" target="_blank" class="text-primary">
 						{$endpoint}/tasks/{$task.id}
 					</a>
 				</p>
