@@ -120,38 +120,38 @@ async function processTranscription(
     // Call the external AI service for transcription
     const transcriptionResult = await sendToAIService('transcribe', audioPath, {
       language,
-      format
+      format,
     })
-    
+
     // Handle the response and save the transcription result
-    let contentToSave = '';
-    
+    let contentToSave = ''
+
     // Determine what to save based on the response structure and requested format
     if (typeof transcriptionResult === 'string') {
       // If the service returned a plain string
-      contentToSave = transcriptionResult;
+      contentToSave = transcriptionResult
     } else if (transcriptionResult && typeof transcriptionResult === 'object') {
       // If service returned an object, try to find the text content
       if (format === 'txt' && transcriptionResult.text) {
-        contentToSave = transcriptionResult.text;
+        contentToSave = transcriptionResult.text
       } else if ((format === 'srt' || format === 'vtt') && transcriptionResult.subtitle) {
-        contentToSave = transcriptionResult.subtitle;
+        contentToSave = transcriptionResult.subtitle
       } else if (transcriptionResult.transcription) {
         // Common alternative property name
-        contentToSave = transcriptionResult.transcription;
+        contentToSave = transcriptionResult.transcription
       } else {
         // Fallback: save the entire response as JSON
-        contentToSave = JSON.stringify(transcriptionResult, null, 2);
+        contentToSave = JSON.stringify(transcriptionResult, null, 2)
       }
     } else {
       // If we got something unexpected, save an error message
-      contentToSave = `Error: Received unexpected response from transcription service: ${transcriptionResult}`;
+      contentToSave = `Error: Received unexpected response from transcription service: ${transcriptionResult}`
     }
-    
+
     // Write the content to the output file
     await fs.writeFile(transcriptionPath, contentToSave, 'utf8')
     log.info(`Transcription saved at ${transcriptionPath}`)
-    
+
     // Clean up: Delete the temporary audio file since we don't need it anymore
     try {
       await fs.unlink(audioPath)
@@ -181,13 +181,13 @@ async function processTranscription(
  * Send audio file to AI service
  */
 async function sendToAIService(
-  jobName: string, 
+  jobName: string,
   filePath: string,
-  options: Record<string, string | number | boolean> = {}
+  options: Record<string, string | number | boolean> = {},
 ) {
   const formData = new FormData()
   formData.append('audio', readFileSync(filePath), { filename: path.basename(filePath) })
-  
+
   // Add any options as form fields
   Object.entries(options).forEach(([key, value]) => {
     formData.append(key, String(value))
@@ -198,15 +198,15 @@ async function sendToAIService(
     const response = await axios.post(`${AI_URL}/${jobName}`, formData, {
       headers: { ...formData.getHeaders() },
     })
-    
+
     // Log what we received for debugging
     log.info(`Received response from AI service: ${typeof response.data}`)
-    
+
     if (typeof response.data === 'object') {
       // Log a sample of the response object's keys
       log.info(`Response keys: ${Object.keys(response.data).join(', ')}`)
     }
-    
+
     return response.data
   } catch (error) {
     log.error(`[ERROR] Failed AI job: ${jobName}`, error)
