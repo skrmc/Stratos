@@ -34,9 +34,11 @@ export const aiService = {
 
       // We'll use the first file as the input
       const inputFile = taskFiles[0]
-      const inputFileInfo = { file_path: inputFile.file_path, 
-                              file_name: inputFile.file_name, 
-                              mime_type: inputFile.mime_type }
+      const inputFileInfo = {
+        file_path: inputFile.file_path,
+        file_name: inputFile.file_name,
+        mime_type: inputFile.mime_type,
+      }
 
       // Create task-specific output directory if it doesn't exist
       const outputDir = path.join(OUTPUT_CONFIG.DIR, taskId)
@@ -79,8 +81,11 @@ export const aiService = {
 /**
  * Process Transcription task
  */
-async function processTranscription(commandResult: ParsedCommand,
-  inputFile: { file_path: string; file_name: string; mime_type: string }, outputDir: string) : Promise<string> {
+async function processTranscription(
+  commandResult: ParsedCommand,
+  inputFile: { file_path: string; file_name: string; mime_type: string },
+  outputDir: string,
+): Promise<string> {
   const options = commandResult.options || {}
   const language = (options.language as string) || 'auto'
   const format = (options.format as string) || 'txt'
@@ -102,7 +107,9 @@ async function processTranscription(commandResult: ParsedCommand,
 
   // optionsString : "language-auto-format-txt"
   // safeFilePath  : Replace '/' with '+' in the filePath for URL safety
-  const optionsString = Object.entries({ language, format }).map(([key, value]) => `${key}-${value}`)
+  const optionsString = Object.entries({ language, format }).map(
+    ([key, value]) => `${key}-${value}`,
+  )
   const safeFilePath = audioPath.replace(/\//g, '+')
 
   log.info(`Sending file to AI service: transcribe with ${audioPath}`)
@@ -120,7 +127,6 @@ async function processTranscription(commandResult: ParsedCommand,
       // Don't fail the whole operation if cleanup fails
       log.warn(`Failed to clean up audio file ${audioPath}: ${cleanupError}`)
     }
-
   } catch (error) {
     log.error(`Failed to get transcription from AI service: ${error}`)
 
