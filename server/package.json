@@ -5,32 +5,30 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "format": "biome --write .",
     "test": "cd test && bun test",
     "dev": "bun run --watch src/index.ts",
-    "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "lint:fix": "biome lint --write --unsafe .",
+    "lint": "biome lint ."
   },
   "dependencies": {
-    "@hono/node-server": "^1.13.8",
-    "axios": "^1.7.9",
+    "@hono/node-server": "^1.14.0",
+    "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
-    "hono": "^4.7.2",
+    "hono": "^4.7.5",
     "jsonwebtoken": "^9.0.2",
     "postgres": "^3.4.5",
     "uuid": "^11.1.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.13.5",
-    "bun-types": "^1.2.3",
-    "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.0.1",
+    "@types/node": "^22.13.17",
+    "bun-types": "^1.2.8",
     "jiti": "^2.4.2",
-    "prettier": "^3.5.2",
-    "tsx": "^4.19.3",
-    "typescript-eslint": "^8.24.1"
+    "tsx": "^4.19.3"
   }
 }

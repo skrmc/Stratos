@@ -12,33 +12,33 @@ import { AI_COMMANDS, getAICommandDetails, getAICommands } from './aiCommands.js
  */
 export function parseCommand(commandStr: string): ParsedCommand {
   // Trim the command string
-  commandStr = commandStr.trim()
+  const cmd = commandStr.trim()
 
   // Check if it's an AI command
-  if (commandStr.startsWith('/ai-')) {
-    return parseAICommand(commandStr)
+  if (cmd.startsWith('/ai-')) {
+    return parseAICommand(cmd)
   }
 
   // Check if it's a built-in command
-  if (commandStr.startsWith('/')) {
-    return parseBuiltinCommand(commandStr)
+  if (cmd.startsWith('/')) {
+    return parseBuiltinCommand(cmd)
   }
 
-  if (commandStr.startsWith('ffmpeg ')) {
+  if (cmd.startsWith('ffmpeg ')) {
     return {
       type: 'ffmpeg',
-      command: commandStr,
+      command: cmd,
     }
-  } else if (commandStr.startsWith('ffprobe ')) {
+  } else if (cmd.startsWith('ffprobe ')) {
     return {
       type: 'ffprobe',
-      command: commandStr,
+      command: cmd,
     }
   }
 
   return {
     type: 'ffmpeg',
-    command: commandStr,
+    command: cmd,
   }
 }
 
