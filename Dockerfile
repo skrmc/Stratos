@@ -33,7 +33,7 @@ RUN wget -q https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun
     && unzip -j bun-${target}.zip -d /usr/local/bin && rm bun-${target}.zip \
     && chmod +x /usr/local/bin/bun
 
-COPY server/package.json server/.env .
+COPY server/package.json .env .
 COPY --from=web /web/build dist
 
 RUN bun install
