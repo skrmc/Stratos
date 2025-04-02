@@ -41,7 +41,9 @@ export interface ListOptions {
   userId?: number
 }
 
-export interface ListResult {
+
+// File list result type
+export interface FileListResult {
   files: any[]
   nextCursor: string | null
   hasMore: boolean

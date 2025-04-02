@@ -1,12 +1,12 @@
 import type { Context } from 'hono'
-import { uploadService } from '../services/uploadService.js'
+import { fileService } from '../services/fileService.js'
 import { uploadValidation } from '../utils/uploadValidation.js'
 import { validate as ValidUUID } from 'uuid'
 import log from '../config/logger.js'
 import type { ListQueryParams } from '../types/index.js'
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '../types/index.js'
 
-export const uploadsController = {
+export const fileController = {
   upload: async (c: Context) => {
     try {
       const body = await c.req.parseBody()
@@ -39,7 +39,7 @@ export const uploadsController = {
         userId: userId
       })
 
-      const result = await uploadService.upload(file, id, userId)
+      const result = await fileService.upload(file, id, userId)
       log.info(`Successfully uploaded: ${result.file_name}`)
 
       return c.json({
@@ -75,7 +75,7 @@ export const uploadsController = {
         return c.json({ error: 'Invalid UUID' }, 400)
       }
 
-      await uploadService.deleteUpload(id)
+      await fileService.delete(id)
       log.info('File deleted successfully', { id })
 
       return c.json({ success: true })
@@ -104,7 +104,7 @@ export const uploadsController = {
         }
       }
 
-      const result = await uploadService.listUploads({
+      const result = await fileService.list({
         limit: validLimit,
         cursor: cursorData,
         userId: userId
