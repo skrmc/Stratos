@@ -1,39 +1,18 @@
 // lib/stores.ts
 import { writable } from 'svelte/store'
 import { persist } from '$lib/utils/storage'
-
-export type FileItem = {
-	id: string
-	name: string
-	size: number
-	type: string
-	time: string
-	icon: string
-	progress: number
-	thumb?: string
-	xhr?: XMLHttpRequest
-}
-
-export type TaskItem = {
-	id: string
-	status: string
-	created_at: string
-	updated_at?: string
-	result_path?: string
-	error?: string | null
-}
+import type { FileItem, TaskItem } from '$lib/types'
 
 export const files = writable<FileItem[]>([])
 export const tasks = writable<TaskItem[]>([])
 
-export const serverStatus = writable<{
-	online: boolean
-	uptime: string
+export const uptime = writable('')
+export const online = writable(false)
+
+export const counter = writable<{
 	countdown: number
 	counting: boolean
 }>({
-	online: false,
-	uptime: '',
 	countdown: 10,
 	counting: false,
 })
@@ -45,7 +24,7 @@ export const showConfigModal = writable<boolean>(false)
 export const currentTab = writable<string>('files')
 
 export const token = persist<string>('token', '')
-export const endpoint = persist<string>('endpoint',	'/api')
+export const endpoint = persist<string>('endpoint', '/api')
 
 export const slashCommands: string[] = [
 	'extract-audio',
