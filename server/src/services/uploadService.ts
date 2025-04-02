@@ -24,6 +24,7 @@ export const uploadService = {
       await uploadService.ensureUploadDirectory()
 
       const fileName = file.name
+      const fileType = file.type
       const filePath = path.join(UPLOAD_CONFIG.DIR, id)
       const fileWriter = Bun.file(filePath).writer()
       const stream = file.stream()
@@ -48,7 +49,7 @@ export const uploadService = {
           ${fileName},
           ${filePath},
           ${fileSize},
-          ${file.type}
+          ${fileType}
         ) RETURNING id, file_name, file_path
       `
 
@@ -93,11 +94,11 @@ export const uploadService = {
     let baseQuery = sql`
       SELECT 
         id,
-        file_name,
-        file_size,
-        mime_type,
-        uploaded_at,
-        file_path
+        file_name AS name,
+        file_size AS size,
+        mime_type AS type,
+        file_path AS path,
+        uploaded_at
       FROM files
     `
 
