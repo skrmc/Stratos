@@ -51,3 +51,9 @@ export default {
     clearInterval(cleanupJob)
   }
 }
+
+process.on('SIGTERM', () => {
+  log.info('Received SIGTERM, shutting down...')
+  clearInterval(cleanupJob)
+  process.exit(0)
+})
