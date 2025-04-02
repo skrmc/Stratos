@@ -34,9 +34,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use('/*', serveStatic({ root: './dist' }))
-
 app.get('*', serveStatic({ path: './dist/index.html' }))
-
 
 // Schedule cleanup job to run every hour
 const cleanupInterval = parseInt(process.env.CLEANUP_INTERVAL_MINUTES || '60', 10)
