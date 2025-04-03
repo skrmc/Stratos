@@ -15,7 +15,7 @@ import tasks from './routes/tasks.js'
 const app = new Hono()
 
 //Middleware
-app.use('/*', cors())
+app.use('*', cors())
 
 const api = new Hono()
 //Routes
@@ -23,17 +23,16 @@ api.route('/auth', auth)
 api.route('/uploads', uploads)
 api.route('/status', status)
 api.route('/tasks', tasks)
+app.route('/ai', ai)
 
 app.route('/api', api)
-app.route('/auth', auth)
-app.route('/ai', ai)
 
 //this route is only defined in dev env. not part of the actual application
 if (process.env.NODE_ENV === 'development') {
   app.route('/dev', dev)
 }
 
-app.use('/*', serveStatic({ root: './dist' }))
+app.use('*', serveStatic({ root: './dist' }))
 
 // Schedule cleanup job to run every hour
 const cleanupInterval = parseInt(process.env.CLEANUP_INTERVAL_MINUTES || '60', 10)

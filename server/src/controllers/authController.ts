@@ -11,7 +11,8 @@ export const authController = {
       return c.json(result)
     } catch (error) {
       log.error('Registration failed:', error)
-      return c.json({ error: `Registration failed: ${error}` }, 500)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return c.json({ error: `Registration failed: ${errorMessage}` }, 500)
     }
   },
 
@@ -23,7 +24,8 @@ export const authController = {
       return c.json(result)
     } catch (error) {
       log.error('Login failed:', error)
-      return c.json({ error: `Login failed: ${error}` }, 500)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return c.json({ error: `Login failed: ${errorMessage}` }, 500)
     }
   },
   getMe: async (c: Context) => {
@@ -40,7 +42,8 @@ export const authController = {
       return c.json(userData)
     } catch (error) {
       log.error('Get me error:', error)
-      return c.json({ error: 'Failed to retrieve user data' }, 500)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return c.json({ error: `Failed to retrieve user data: ${errorMessage}` }, 500)
     }
   },
 }
