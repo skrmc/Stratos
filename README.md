@@ -1,5 +1,6 @@
 # Stratos
-
+[![Build Status](https://github.com/StratosIO/Stratos/actions/workflows/build.yml/badge.svg)](https://github.com/StratosIO/Stratos/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/StratosIO/Stratos/blob/master/LICENSE)
 > **⚠️ Work in Progress (WIP):**  
 > This project is still under development. Features are subject to change.
 
