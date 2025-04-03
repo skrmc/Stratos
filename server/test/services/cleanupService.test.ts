@@ -82,7 +82,6 @@ describe('cleanupService', () => {
           { id: testTaskId, result_path: testOutputPath }
         ];
         
-        // Delete the files (this is the actual functionality we want to test)
         for (const file of expiredFiles) {
           try {
             await fs.unlink(file.file_path);
@@ -103,10 +102,8 @@ describe('cleanupService', () => {
       }
     };
     
-    // Run the cleanup function
     await testCleanupService.cleanupExpiredFiles();
     
-    // Check if files were removed from filesystem
     let fileExists = true;
     let outputDirExists = true;
     
@@ -127,10 +124,8 @@ describe('cleanupService', () => {
   });
   
   test('cleanupExpiredFiles handles missing files gracefully', async () => {
-    // Delete the file before running cleanup
     await fs.unlink(testFilePath);
     
-    // Create a simplified version just to test error handling
     const testCleanupService = {
       cleanupExpiredFiles: async () => {
         // Simulate getting expired files that don't exist
@@ -143,20 +138,15 @@ describe('cleanupService', () => {
           try {
             await fs.unlink(file.file_path);
           } catch (error) {
-            // This should be caught internally
-            // If we reach the end of the function, the test passes
           }
         }
       }
     };
     
-    // Fix: Don't use resolves.not.toThrow() here, just run the function and check it doesn't throw
     try {
       await testCleanupService.cleanupExpiredFiles();
-      // If we get here, no exception was thrown
-      expect(true).toBe(true); // This always passes
+      expect(true).toBe(true); 
     } catch (error) {
-      // If an exception was thrown, fail the test
       expect('function threw an error').toBe('function should not throw');
     }
   });

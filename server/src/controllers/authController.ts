@@ -26,4 +26,21 @@ export const authController = {
       return c.json({ error: 'Login failed' }, 500)
     }
   },
+  getMe: async (c: Context) => {
+    try {
+      // The user data is attached to the request by the auth middleware
+      const user = c.get('user')
+
+      if (!user || !user.userId) {
+        log.error('Get me error: No user in context')
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
+
+      const userData = await authService.getUserById(user.userId)
+      return c.json(userData)
+    } catch (error) {
+      log.error('Get me error:', error)
+      return c.json({ error: 'Failed to retrieve user data' }, 500)
+    }
+  },
 }

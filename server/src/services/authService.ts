@@ -66,4 +66,21 @@ export const authService = {
       token,
     }
   },
+  getUserById: async (userId: number) => {
+    const users = await sql`
+      SELECT id, username, email, role
+      FROM users WHERE id = ${userId}
+    `
+
+    if (users.length === 0) {
+      throw new Error('User not found')
+    }
+
+    return {
+      id: users[0].id,
+      username: users[0].username,
+      email: users[0].email,
+      role: users[0].role,
+    }
+  },
 }
