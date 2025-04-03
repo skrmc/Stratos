@@ -1,7 +1,6 @@
 <!-- lib/components/FileUploader.svelte -->
 <script lang="ts">
 	import { token, endpoint, files, online, showConfigModal } from '$lib/stores'
-	import { get } from 'svelte/store'
 
 	const selectIcon = (file: File): string => {
 		if (file.type.startsWith('video/')) return 'videocam'
@@ -36,8 +35,8 @@
 
 	async function uploadFile(file: File, id: string) {
 		const xhr = new XMLHttpRequest()
-		xhr.open('POST', `${get(endpoint)}/uploads`)
-		xhr.setRequestHeader('Authorization', `Bearer ${get(token)}`)
+		xhr.open('POST', `${$endpoint}/uploads`)
+		xhr.setRequestHeader('Authorization', `Bearer ${$token}`)
 
 		const formData = new FormData()
 		formData.append('file', file)
@@ -87,7 +86,7 @@
 				},
 			])
 
-			if (get(online)) {
+			if ($online) {
 				uploadFile(file, id).catch(() => {})
 			} else {
 				showConfigModal.set(true)
@@ -123,7 +122,7 @@
 		type="file"
 		accept="*/*"
 		multiple
-		class="file-input w-full transition-colors focus:outline-none"
+		class="file-input w-full transition-colors"
 		onchange={(e) => readFile((e.target as HTMLInputElement).files!)}
 	/>
 </div>

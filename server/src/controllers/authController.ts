@@ -10,8 +10,9 @@ export const authController = {
       log.info(`User registered successfully: ${email}`)
       return c.json(result)
     } catch (error) {
-      log.error('Registration error:', error)
-      return c.json({ error: 'Registration failed' }, 500)
+      log.error('Registration failed:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return c.json({ error: `Registration failed: ${errorMessage}` }, 500)
     }
   },
 
@@ -22,8 +23,27 @@ export const authController = {
       log.info(`User logged in successfully: ${email}`)
       return c.json(result)
     } catch (error) {
-      log.error('Login error:', error)
-      return c.json({ error: 'Login failed' }, 500)
+      log.error('Login failed:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return c.json({ error: `Login failed: ${errorMessage}` }, 500)
+    }
+  },
+  getMe: async (c: Context) => {
+    try {
+      // The user data is attached to the request by the auth middleware
+      const user = c.get('user')
+
+      if (!user || !user.userId) {
+        log.error('Get me error: No user in context')
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
+
+      const userData = await authService.getUserById(user.userId)
+      return c.json(userData)
+    } catch (error) {
+      log.error('Get me error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return c.json({ error: `Failed to retrieve user data: ${errorMessage}` }, 500)
     }
   },
 }

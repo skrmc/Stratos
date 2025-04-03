@@ -1,9 +1,9 @@
 import sql from '../config/database.js'
 import log from '../config/logger.js'
-import path from 'path'
-import fs from 'fs/promises'
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import path from 'node:path'
+import fs from 'node:fs/promises'
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
 import { OUTPUT_CONFIG } from '../types/index.js'
 import type { ParsedCommand } from '../types/index.js'
 import axios from 'axios'
@@ -103,7 +103,7 @@ async function processTranscription(
 
   // Define output file path for transcription result
   const transcriptionFile = `${baseName}-transcription.${format}`
-  let resultFilePath = path.join(outputDir, transcriptionFile)
+  const resultFilePath = path.join(outputDir, transcriptionFile)
 
   // optionsString : "language-auto-format-txt"
   // safeFilePath  : Replace '/' with '+' in the filePath for URL safety

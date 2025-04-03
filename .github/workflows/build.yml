@@ -31,7 +31,7 @@ jobs:
       run: bun test
       working-directory: ${{ matrix.directory }}
 
-    - name: Run ESLint
+    - name: Run Linter
       run: bun run lint
       working-directory: ${{ matrix.directory }}
 

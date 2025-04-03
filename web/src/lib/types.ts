@@ -1,3 +1,12 @@
+import type { Writable } from 'svelte/store'
+
+export type UserInfo = {
+	id: string
+	username: string
+	email: string
+	role: string
+}
+
 export type FileItem = {
 	id: string
 	name: string
@@ -17,4 +26,22 @@ export type TaskItem = {
 	updated_at?: string
 	result_path?: string
 	error?: string | null
+}
+
+export type DeleteOptions = {
+	id: string | number
+	endpoint: string
+	resource: string
+	token: string
+}
+
+export type FetchOptions<T, R> = {
+	endpoint: string
+	resource: string
+	store: Writable<T[]>
+	transform: (raw: R) => T
+	token: string
+	limit?: number
+	cursor?: string
+	append?: boolean
 }

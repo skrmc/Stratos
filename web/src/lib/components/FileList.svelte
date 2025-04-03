@@ -1,12 +1,11 @@
 <!-- lib/components/FileList.svelte -->
 <script lang="ts">
 	import { token, endpoint, fileSelected, files } from '$lib/stores'
-	import { deleteRemoteItem } from '$lib/utils/items'
-	import { get } from 'svelte/store'
+	import { deleteRemoteItem } from '$lib/utils/requests'
 
 	async function deleteFile(index: number, e: Event): Promise<void> {
 		e.stopPropagation()
-		const currentFiles = get(files)
+		const currentFiles = $files
 		const fileToDelete = currentFiles[index]
 
 		fileToDelete.xhr?.abort?.()
@@ -14,8 +13,8 @@
 		if (fileToDelete.progress === 100) {
 			const ok = await deleteRemoteItem({
 				id: fileToDelete.id,
-				endpoint: get(endpoint),
-				token: get(token),
+				endpoint: $endpoint,
+				token: $token,
 				resource: 'uploads',
 			})
 			if (!ok) return
@@ -29,7 +28,7 @@
 
 		fileSelected.update((currentIndex) => {
 			if (currentIndex === index) {
-				return get(files).length ? 0 : -1
+				return $files.length ? 0 : -1
 			}
 			if (currentIndex > index) {
 				return currentIndex - 1

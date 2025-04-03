@@ -1,17 +1,20 @@
 import type { Context } from 'hono'
-import { uploadService } from '../services/uploadService.js'
+import { fileService } from '../services/fileService.js'
 import { uploadValidation } from '../utils/uploadValidation.js'
 import { validate as ValidUUID } from 'uuid'
 import log from '../config/logger.js'
 import type { ListQueryParams } from '../types/index.js'
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '../types/index.js'
 
-export const uploadsController = {
+export const fileController = {
   upload: async (c: Context) => {
     try {
       const body = await c.req.parseBody()
       const file = body.file
       const id = body.id as string
+      
+      // Get user from context after authentication middleware
+      const userId = c.get('user').userId
 
       if (!file || !(file instanceof File)) {
         log.warn('Upload attempted with no file')
@@ -33,9 +36,10 @@ export const uploadsController = {
         fileSize: file.size,
         mimeType: file.type,
         id: id,
+        userId: userId
       })
 
-      const result = await uploadService.upload(file, id)
+      const result = await fileService.upload(file, id, userId)
       log.info(`Successfully uploaded: ${result.file_name}`)
 
       return c.json({
@@ -62,13 +66,16 @@ export const uploadsController = {
   delete: async (c: Context) => {
     try {
       const id = c.req.param('id')
+      
+      // Get user from context after authentication middleware
+      const userId = c.get('user').userId
 
       if (!ValidUUID(id)) {
         log.warn('Delete attempted with invalid UUID', { id })
         return c.json({ error: 'Invalid UUID' }, 400)
       }
 
-      await uploadService.deleteUpload(id)
+      await fileService.delete(id)
       log.info('File deleted successfully', { id })
 
       return c.json({ success: true })
@@ -79,9 +86,12 @@ export const uploadsController = {
   list: async (c: Context) => {
     try {
       const { limit, cursor } = c.req.query()
+      
+      // Get user from context after authentication middleware
+      const userId = c.get('user').userId
 
       // Parse and validate limit
-      const parseLimit = parseInt(limit || String(DEFAULT_PAGE_SIZE))
+      const parseLimit = Number.parseInt(limit || String(DEFAULT_PAGE_SIZE))
       const validLimit = Math.min(Math.max(1, parseLimit), MAX_PAGE_SIZE)
 
       // Parse cursor if provided
@@ -94,9 +104,10 @@ export const uploadsController = {
         }
       }
 
-      const result = await uploadService.listUploads({
+      const result = await fileService.list({
         limit: validLimit,
         cursor: cursorData,
+        userId: userId
       })
 
       return c.json({

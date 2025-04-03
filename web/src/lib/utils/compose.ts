@@ -1,4 +1,4 @@
-// lib/utils/input.ts
+// lib/utils/compose.ts
 import type { FileItem } from '$lib/types'
 
 export function getCommandText(inputElement: HTMLDivElement): string {

@@ -1,34 +1,32 @@
 services:
-  database:
+  stratos-db:
     image: docker.io/postgres:latest
-    container_name: stratos-database
+    container_name: ${CONTAINER_NAME_DB}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d stratos"]
       interval: 3s
       timeout: 3s
       retries: 4
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: stratos
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres:/var/lib/postgresql/data
       - ./server/src/config/init.sql:/docker-entrypoint-initdb.d/init.sql
 
-  backend:
-    container_name: stratos-server
+  stratos:
+    container_name: ${CONTAINER_NAME}
     image: localhost/stratos:dev
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - ${SERVER_PORT}:3000
     depends_on:
-      database:
+      stratos-db:
         condition: service_healthy
-      ai:
+      stratos-ai:
         condition: service_started
     environment:
       - AI_URL=http://ai:5001
@@ -37,8 +35,8 @@ services:
       - uploads:/app/uploads
       - outputs:/app/outputs
   
-  ai:
-    container_name: stratos-ai
+  stratos-ai:
+    container_name: ${CONTAINER_NAME_AI}
     image: localhost/stratos-ai:dev
     build:
       context: ai

@@ -28,8 +28,8 @@
  * Logger.debug('Debug information', { debugData })
  */
 import winston from 'winston'
-import path from 'path'
-import fs from 'fs'
+import path from 'node:path'
+import fs from 'node:fs'
 
 // Ensure logs directory exists
 const logsDir = path.join(process.cwd(), 'logs')

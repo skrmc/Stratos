@@ -23,7 +23,8 @@ export const BUILTIN_COMMANDS: Record<string, BuiltinCommandDefinition> = {
     ],
     transform: (input, options) => {
       const format = options.format || 'mp3'
-      let codec, ext
+      let codec
+      let ext
 
       if (format === 'mp3') {
         codec = 'libmp3lame'
@@ -70,9 +71,9 @@ export const BUILTIN_COMMANDS: Record<string, BuiltinCommandDefinition> = {
 
       if (format === 'mp4') {
         return `ffmpeg -i ${input} -c:v libx264 -crf ${quality} ${resolution} -preset medium -c:a aac -b:a 128k output.mp4`
-      } else if (format === 'mov') {
+      }if (format === 'mov') {
         return `ffmpeg -i ${input} -c:v libx264 -crf ${quality} ${resolution} -preset medium -c:a aac -b:a 128k output.mov`
-      } else if (format === 'webm') {
+      }if (format === 'webm') {
         return `ffmpeg -i ${input} -c:v libvpx-vp9 -crf ${quality} ${resolution} -b:v 0 -c:a libopus output.webm`
       }
 
@@ -163,7 +164,8 @@ export const BUILTIN_COMMANDS: Record<string, BuiltinCommandDefinition> = {
       const format = options.format || 'mp4'
 
       // CRF values - higher = more compression
-      let crf, preset
+      let crf
+      let preset
       if (level === 'light') {
         crf = '23'
         preset = 'medium'
@@ -185,9 +187,9 @@ export const BUILTIN_COMMANDS: Record<string, BuiltinCommandDefinition> = {
       // Codec and container format combinations
       if (codec === 'h264') {
         return `ffmpeg -i ${input} ${scale} -c:v libx264 -crf ${crf} -preset ${preset} -c:a aac -b:a 96k output.${format === 'webm' ? 'mp4' : format}`
-      } else if (codec === 'h265') {
+      }if (codec === 'h265') {
         return `ffmpeg -i ${input} ${scale} -c:v libx265 -crf ${crf} -preset ${preset} -c:a aac -b:a 96k output.${format === 'webm' ? 'mp4' : format}`
-      } else if (codec === 'vp9') {
+      }if (codec === 'vp9') {
         return `ffmpeg -i ${input} ${scale} -c:v libvpx-vp9 -crf ${crf} -b:v 0 -c:a libopus -b:a 96k output.${format === 'mp4' ? 'webm' : format}`
       }
       // Default fallback
@@ -243,9 +245,9 @@ export const BUILTIN_COMMANDS: Record<string, BuiltinCommandDefinition> = {
 
       // Quality settings
       const quality = options.quality || 'copy'
-      let videoCodec,
-        audioCodec,
-        extraParams = ''
+      let videoCodec
+      let audioCodec
+      let extraParams = ''
 
       if (quality === 'copy') {
         // Fast, lossless stream copy (no re-encoding)

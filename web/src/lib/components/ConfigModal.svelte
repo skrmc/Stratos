@@ -1,17 +1,14 @@
 <!-- lib/components/ConfigModal.svelte -->
 <script lang="ts">
 	import { endpoint, showConfigModal } from '$lib/stores'
-	import { get } from 'svelte/store'
 	import { fade, fly } from 'svelte/transition'
-
-	let current: string = $state(get(endpoint))
 
 	function closeModal() {
 		showConfigModal.set(false)
 	}
 
 	function saveApiEndpoint() {
-		endpoint.set(current.replace(/\/$/, ''))
+		endpoint.set($endpoint.replace(/\/$/, ''))
 		closeModal()
 	}
 </script>
@@ -21,9 +18,9 @@
 		<h3 class="mb-4 text-lg font-bold">Set API Endpoint</h3>
 		<input
 			type="text"
-			bind:value={current}
+			bind:value={$endpoint}
 			placeholder="Enter API Endpoint"
-			class="input w-full transition-colors focus:outline-none"
+			class="input w-full transition-colors"
 		/>
 		<div class="modal-action">
 			<button onclick={closeModal} class="btn btn-ghost">Cancel</button>

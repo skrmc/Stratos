@@ -1,41 +1,28 @@
 <!-- routes/+layout.svelte -->
 <script lang="ts">
-	import '../app.css'
-	import 'material-icons/iconfont/material-icons.css'
-	import { online, endpoint, files, tasks } from '$lib/stores'
-	import { fetchAllRemoteItems } from '$lib/utils/items'
-	import type { FileItem } from '$lib/types'
-	import { get } from 'svelte/store'
+    import '../app.css'
+    import 'material-icons/iconfont/material-icons.css'
+    import { synchronizeUserData, initializeStatusMonitor } from '$lib/utils/requests'
+    import { online } from '$lib/stores'
+    import { page } from '$app/state'
 
-	const { children } = $props()
+    const { children } = $props()
+    let hasSynced = false
 
-	let wasOnline = get(online)
-
-	$effect(() => {
-		if (!wasOnline && $online) {
-			const ep = get(endpoint)
-
-			fetchAllRemoteItems<FileItem, FileItem>({
-				endpoint: ep,
-				resource: 'uploads',
-				store: files,
-				transform: (raw) => ({
-					...raw,
-					icon: 'cloud_sync',
-					progress: 100,
-				}),
-			})
-
-			fetchAllRemoteItems({
-				endpoint: ep,
-				resource: 'tasks',
-				store: tasks,
-				transform: (r) => r,
-			})
-		}
-
-		wasOnline = $online
-	})
+    $effect(initializeStatusMonitor)
+    
+    $effect(() => {
+        const isAuthPath = page.url.pathname.startsWith('/auth');
+        if ($online && !isAuthPath && (!hasSynced || document.visibilityState === 'visible')) {
+            synchronizeUserData().then(success => {
+                if (!success) {
+                    window.location.href = '/auth/login';
+                } else {
+                    hasSynced = true;
+                }
+            });
+        }
+    });
 </script>
 
 {@render children()}
