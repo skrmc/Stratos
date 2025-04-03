@@ -1,18 +1,16 @@
 <!-- lib/components/TaskList.svelte -->
 <script lang="ts">
 	import { token, endpoint, taskSelected, tasks } from '$lib/stores'
-	import { deleteRemoteItem } from '$lib/utils/items'
-	import { get } from 'svelte/store'
+	import { deleteRemoteItem } from '$lib/utils/requests'
 
 	async function deleteTask(index: number, e: Event): Promise<void> {
 		e.stopPropagation()
-		const currentTasks = get(tasks)
-		const taskToDelete = currentTasks[index]
+		const taskToDelete = $tasks[index]
 
 		const ok = await deleteRemoteItem({
 			id: taskToDelete.id,
-			endpoint: get(endpoint),
-			token: get(token),
+			endpoint: $endpoint,
+			token: $token,
 			resource: 'tasks',
 		})
 		if (!ok) return
@@ -25,7 +23,7 @@
 
 		taskSelected.update((currentIndex) => {
 			if (currentIndex === index) {
-				return get(tasks).length ? 0 : -1
+				return $tasks.length ? 0 : -1
 			}
 			if (currentIndex > index) {
 				return currentIndex - 1
@@ -40,11 +38,12 @@
 
 	// TODO: This should be replaced by SSE
 	async function pollTaskStatus() {
-		const currentTasks = get(tasks)
 		const updatedTasks = await Promise.all(
-			currentTasks.map(async (task) => {
+			$tasks.map(async (task) => {
 				try {
-					const res = await fetch(`${get(endpoint)}/tasks/${task.id}/status`)
+					const res = await fetch(`${$endpoint}/tasks/${task.id}/status`, {
+						headers: { Authorization: `Bearer ${$token}` },
+					})
 					if (!res.ok) {
 						console.error('Failed to fetch status for task', task.id)
 						return task

@@ -10,8 +10,8 @@ export const authController = {
       log.info(`User registered successfully: ${email}`)
       return c.json(result)
     } catch (error) {
-      log.error('Registration error:', error)
-      return c.json({ error: 'Registration failed' }, 500)
+      log.error('Registration failed:', error)
+      return c.json({ error: `Registration failed: ${error}` }, 500)
     }
   },
 
@@ -22,8 +22,8 @@ export const authController = {
       log.info(`User logged in successfully: ${email}`)
       return c.json(result)
     } catch (error) {
-      log.error('Login error:', error)
-      return c.json({ error: 'Login failed' }, 500)
+      log.error('Login failed:', error)
+      return c.json({ error: `Login failed: ${error}` }, 500)
     }
   },
   getMe: async (c: Context) => {

@@ -1,7 +1,7 @@
 <!-- lib/components/TaskDetail.svelte -->
 <script lang="ts">
 	import { taskSelected, tasks, endpoint } from '$lib/stores'
-	import { derived, get } from 'svelte/store'
+	import { derived } from 'svelte/store'
 
 	const task = derived(
 		[tasks, taskSelected],

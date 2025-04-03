@@ -5,17 +5,17 @@
 		endpoint,
 		files,
 		tasks,
+		token,
 		taskSelected,
 		showConfigModal,
 		currentTab,
 		slashCommands,
 	} from '$lib/stores'
-	import { get } from 'svelte/store'
 	import {
 		getCommandText,
 		insertMentionAtCursor,
 		insertSlashCommandAtCursor,
-	} from '$lib/utils/input'
+	} from '$lib/utils/compose'
 
 	let inputElement: HTMLDivElement
 	let showSuggestions = $state(false)
@@ -162,11 +162,14 @@
 	}
 
 	async function sendCommand() {
-		const path = `${get(endpoint)}/tasks`
-		const msg = get(command).trim()
+		const path = `${$endpoint}/tasks`
+		const msg = $command.trim()
 		const response = await fetch(path, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${$token}`,
+			},
 			body: JSON.stringify({ command: msg }),
 		})
 		if (!response.ok) {
@@ -179,7 +182,7 @@
 			command.set('')
 			if (data.success && data.task) {
 				tasks.update((curr) => [...curr, data.task])
-				taskSelected.set(get(tasks).length - 1)
+				taskSelected.set($tasks.length - 1)
 				currentTab.set('tasks')
 			}
 		}
@@ -193,7 +196,7 @@
 		role="textbox"
 		aria-multiline="true"
 		tabindex="0"
-		class="textarea bg-base-200 rounded-field w-full break-all transition-colors focus:outline-none"
+		class="textarea bg-base-200 rounded-field w-full break-all transition-colors"
 		oninput={onInput}
 		onkeydown={onKeyDown}
 		onblur={onBlur}
