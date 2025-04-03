@@ -19,7 +19,7 @@
 		"@sveltejs/kit": "^2.20.3",
 		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
-		"@tailwindcss/postcss": "^4.1.0",
+		"@tailwindcss/vite": "^4.1.0",
 		"daisyui": "^5.0.11",
 		"globals": "^16.0.0",
 		"material-icons": "^1.13.14",
