@@ -82,8 +82,8 @@ export const cleanupService = {
   /**
    * Schedule the cleanup job to run periodically
    */
-  scheduleCleanupJob: (intervalMinutes = 60): NodeJS.Timeout => {
-    log.info(`Scheduling cleanup job to run every ${intervalMinutes} minutes`)
+  scheduleCleanupJob: (intervalSeconds: number): NodeJS.Timeout => {
+    log.info(`Scheduling cleanup job to run every ${intervalSeconds} minutes`)
     
     // Run immediately on startup
     cleanupService.cleanupExpiredFiles().catch(err => {
@@ -95,6 +95,6 @@ export const cleanupService = {
       cleanupService.cleanupExpiredFiles().catch(err => {
         log.error('Scheduled cleanup job failed:', err)
       })
-    }, intervalMinutes * 60 * 1000)
+    }, intervalSeconds * 1000)
   }
 } 
