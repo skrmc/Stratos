@@ -1,5 +1,5 @@
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import sql from '../config/database.js'
 import log from '../config/logger.js'
 import { OUTPUT_CONFIG } from '../types/index.js'

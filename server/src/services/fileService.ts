@@ -1,9 +1,9 @@
 import sql from '../config/database.js'
-import { mkdir, chmod, unlink } from 'fs/promises'
+import { mkdir, chmod, unlink } from 'node:fs/promises'
 import { validate as ValidUUID } from 'uuid'
 import { UPLOAD_CONFIG } from '../types/index.js'
 import type { ListOptions, FileListResult } from '../types/index.js'
-import path from 'path'
+import path from 'node:path'
 
 export const fileService = {
   ensureUploadDirectory: async () => {
@@ -20,7 +20,6 @@ export const fileService = {
     }
   },
   upload: async (file: File, id: string, userId: number, expiresInHours = 24): Promise<any> => {
-    try {
       await fileService.ensureUploadDirectory()
 
       const fileName = file.name
@@ -62,9 +61,6 @@ export const fileService = {
       `
 
       return result[0]
-    } catch (error) {
-      throw error
-    }
   },
   delete: async (id: string) => {
     if (!ValidUUID(id)) {
@@ -81,13 +77,7 @@ export const fileService = {
     if (!filePath) {
       throw new Error('File not found')
     }
-
-    // Delete the file first
-    try {
       await unlink(filePath)
-    } catch (error) {
-      throw error
-    }
 
     // Then remove from database
     await sql`

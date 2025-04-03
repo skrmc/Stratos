@@ -91,7 +91,7 @@ export const fileController = {
       const userId = c.get('user').userId
 
       // Parse and validate limit
-      const parseLimit = parseInt(limit || String(DEFAULT_PAGE_SIZE))
+      const parseLimit = Number.parseInt(limit || String(DEFAULT_PAGE_SIZE))
       const validLimit = Math.min(Math.max(1, parseLimit), MAX_PAGE_SIZE)
 
       // Parse cursor if provided

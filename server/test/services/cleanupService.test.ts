@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeEach, afterEach, mock } from "bun:test";
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 // Mock the database module
 mock.module('../../src/config/database.js', () => ({
@@ -11,9 +11,9 @@ mock.module('../../src/config/database.js', () => ({
         // Handle different query patterns based on the mock SQL query
         if (query.includes('DELETE FROM')) {
           return []; // Return empty array for DELETE queries
-        } else if (query.includes('SELECT * FROM files')) {
+        }if (query.includes('SELECT * FROM files')) {
           return []; // Return empty array for SELECT queries after cleanup
-        } else if (query.includes('INSERT INTO')) {
+        }if (query.includes('INSERT INTO')) {
           return [{ id: 'test-id' }]; // Return something for INSERT queries
         }
         return [];

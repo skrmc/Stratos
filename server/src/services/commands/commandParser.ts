@@ -29,7 +29,7 @@ export function parseCommand(commandStr: string): ParsedCommand {
       type: 'ffmpeg',
       command: cmd,
     }
-  } else if (cmd.startsWith('ffprobe ')) {
+  }if (cmd.startsWith('ffprobe ')) {
     return {
       type: 'ffprobe',
       command: cmd,
@@ -116,7 +116,7 @@ function parseBuiltinCommand(commandStr: string): ParsedCommand {
 
         // Convert to number if it looks like one
         if (/^-?\d+(\.\d+)?$/.test(value as string)) {
-          value = parseFloat(value as string)
+          value = Number.parseFloat(value as string)
         }
 
         // Convert to boolean if it's true/false
@@ -214,7 +214,7 @@ function parseAICommand(commandStr: string): ParsedCommand {
 
         // Convert to number if it looks like one
         if (/^-?\d+(\.\d+)?$/.test(value as string)) {
-          value = parseFloat(value as string)
+          value = Number.parseFloat(value as string)
         }
 
         // Convert to boolean if it's true/false

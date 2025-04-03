@@ -28,7 +28,7 @@ export const uploadValidation = {
     if (file.size > MAX_FILE_SIZE) {
       return {
         isValid: false,
-        error: `File too large. Maximum size is 3GB`, // change to 5GB later
+        error: "File too large. Maximum size is 3GB", // change to 5GB later
       }
     }
 

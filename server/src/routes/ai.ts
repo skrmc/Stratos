@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import axios from 'axios'
-import { writeFileSync, unlinkSync, existsSync, readFileSync } from 'fs'
+import { writeFileSync, unlinkSync, existsSync, readFileSync } from 'node:fs'
 import FormData from 'form-data'
 
 const ai = new Hono()
@@ -9,7 +9,7 @@ const AI_URL = process.env.AI_URL || 'http://stratos-ai:5001'
 ai.post('/:job', async (c) => {
   const job = c.req.param('job')
 
-  if (job != 'transcribe') {
+  if (job !== 'transcribe') {
     return c.json({ error: `Unknown AI job: ${job}` }, 400)
   }
 

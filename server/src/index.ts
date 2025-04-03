@@ -35,11 +35,11 @@ if (process.env.NODE_ENV === 'development') {
 app.use('*', serveStatic({ root: './dist' }))
 
 // Schedule cleanup job to run every hour
-const cleanupInterval = parseInt(process.env.CLEANUP_INTERVAL || '3600', 10)
+const cleanupInterval = Number.parseInt(process.env.CLEANUP_INTERVAL || '3600', 10)
 const cleanupJob = cleanupService.scheduleCleanupJob(cleanupInterval)
 
 createAdmin() // adds default admin user to db if doesn't exist
-log.info(`Server is running on http://localhost:3000`)
+log.info("Server is running on http://localhost:3000")
 
 export default {
   port: 3000,
