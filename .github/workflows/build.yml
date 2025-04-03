@@ -63,12 +63,12 @@ jobs:
         (cd server && bun install)
         (cd web && bun install)
     
-    - name: Run Prettier Formatting
+    - name: Run Formatter
       run: |
         (cd server && bun run format)
         (cd web && bun run format)
 
-    - name: Push Prettier Changes
+    - name: Push Changes
       run: |
         git diff --quiet && echo "No formatting changes." && exit 0
         git config --global user.name "github-actions[bot]"

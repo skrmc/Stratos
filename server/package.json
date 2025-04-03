@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "format": "biome --write .",
     "test": "cd test && bun test",
     "dev": "bun run --watch src/index.ts",
+    "format": "biome format --write .",
     "lint:fix": "biome lint --write --unsafe .",
     "lint": "biome lint ."
   },
