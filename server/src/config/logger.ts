@@ -27,70 +27,74 @@
  * Logger.http('GET /api/users')
  * Logger.debug('Debug information', { debugData })
  */
-import winston from 'winston'
-import path from 'node:path'
-import fs from 'node:fs'
+import winston from "winston";
+import path from "node:path";
+import fs from "node:fs";
 
 // Ensure logs directory exists
-const logsDir = path.join(process.cwd(), 'logs')
+const logsDir = path.join(process.cwd(), "logs");
 if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true })
+	fs.mkdirSync(logsDir, { recursive: true });
 }
 
 const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4,
-}
+	error: 0,
+	warn: 1,
+	info: 2,
+	http: 3,
+	debug: 4,
+};
 //colors for console logging :D
 const colors = {
-  error: 'red',
-  warn: 'yellow',
-  info: 'green',
-  http: 'magenta',
-  debug: 'white',
-}
+	error: "red",
+	warn: "yellow",
+	info: "green",
+	http: "magenta",
+	debug: "white",
+};
 
-winston.addColors(colors)
+winston.addColors(colors);
 
 //base format without colors for files
 const baseFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-  winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`),
-)
+	winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
+	winston.format.printf(
+		(info) => `${info.timestamp} ${info.level}: ${info.message}`,
+	),
+);
 
 //colored format for console
 const consoleFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-  winston.format.colorize({ all: true }),
-  winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`),
-)
+	winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
+	winston.format.colorize({ all: true }),
+	winston.format.printf(
+		(info) => `${info.timestamp} ${info.level}: ${info.message}`,
+	),
+);
 
 const transports = [
-  // Console transport with colors
-  new winston.transports.Console({
-    format: consoleFormat,
-  }),
+	// Console transport with colors
+	new winston.transports.Console({
+		format: consoleFormat,
+	}),
 
-  // File transports without colors
-  new winston.transports.File({
-    filename: path.join(logsDir, 'error.log'),
-    level: 'error',
-    format: baseFormat,
-  }),
+	// File transports without colors
+	new winston.transports.File({
+		filename: path.join(logsDir, "error.log"),
+		level: "error",
+		format: baseFormat,
+	}),
 
-  new winston.transports.File({
-    filename: path.join(logsDir, 'all.log'),
-    format: baseFormat,
-  }),
-]
+	new winston.transports.File({
+		filename: path.join(logsDir, "all.log"),
+		format: baseFormat,
+	}),
+];
 
 const log = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  levels,
-  transports,
-})
+	level: process.env.LOG_LEVEL || "info",
+	levels,
+	transports,
+});
 
-export default log
+export default log;

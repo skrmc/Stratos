@@ -7,69 +7,69 @@ let eventSource: EventSource | null = null
 let countdownInterval: number | undefined
 
 export async function fetchUserInfo(endpoint: string, token: string): Promise<UserInfo | null> {
-    const url = `${endpoint}/auth/me`
+	const url = `${endpoint}/auth/me`
 
-    try {
-        const response = await fetch(url, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
+	try {
+		const response = await fetch(url, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
 
-        // Return null for non-OK responses
-        if (!response.ok) {
-            console.error('Failed to fetch user information:', response.status)
-            return null
-        }
+		// Return null for non-OK responses
+		if (!response.ok) {
+			console.error('Failed to fetch user information:', response.status)
+			return null
+		}
 
-        // Parse the response directly as UserInfo
-        const userInfo = await response.json()
-        return userInfo as UserInfo
-    } catch (error) {
-        console.error('Error fetching user information:', error)
-        return null
-    }
+		// Parse the response directly as UserInfo
+		const userInfo = await response.json()
+		return userInfo as UserInfo
+	} catch (error) {
+		console.error('Error fetching user information:', error)
+		return null
+	}
 }
 
 export async function synchronizeUserData(): Promise<boolean> {
-  const currentEndpoint = get(endpoint);
-  const currentToken = get(token);
-  
-  try {
-    const info = await fetchUserInfo(currentEndpoint, currentToken);
-    
-    if (!info) {
-      // Authentication failed
-      return false;
-    }
-    
-    userInfo.set(info);
-    
-    // Fetch files after successful auth
-    await fetchAllRemoteItems<FileItem, FileItem>({
-      endpoint: currentEndpoint,
-      resource: 'uploads',
-      token: currentToken,
-      store: files,
-      transform: (raw) => ({
-        ...raw,
-        icon: 'cloud_sync',
-        progress: 100,
-      }),
-    });
+	const currentEndpoint = get(endpoint)
+	const currentToken = get(token)
 
-    // Fetch tasks
-    await fetchAllRemoteItems({
-      endpoint: currentEndpoint,
-      resource: 'tasks',
-      token: currentToken,
-      store: tasks,
-      transform: (r) => r,
-    });
-    
-    return true;
-  } catch (error) {
-    console.error('Error synchronizing user data:', error);
-    return false;
-  }
+	try {
+		const info = await fetchUserInfo(currentEndpoint, currentToken)
+
+		if (!info) {
+			// Authentication failed
+			return false
+		}
+
+		userInfo.set(info)
+
+		// Fetch files after successful auth
+		await fetchAllRemoteItems<FileItem, FileItem>({
+			endpoint: currentEndpoint,
+			resource: 'uploads',
+			token: currentToken,
+			store: files,
+			transform: (raw) => ({
+				...raw,
+				icon: 'cloud_sync',
+				progress: 100,
+			}),
+		})
+
+		// Fetch tasks
+		await fetchAllRemoteItems({
+			endpoint: currentEndpoint,
+			resource: 'tasks',
+			token: currentToken,
+			store: tasks,
+			transform: (r) => r,
+		})
+
+		return true
+	} catch (error) {
+		console.error('Error synchronizing user data:', error)
+		return false
+	}
 }
 
 export const resetConnection = () => {
