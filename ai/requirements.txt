@@ -1,1 +1,7 @@
 flask
+torch
+torchvision
+numpy
+tqdm
+gdown
+Pillow==9.5.0
