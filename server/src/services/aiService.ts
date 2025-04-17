@@ -210,7 +210,9 @@ async function processSlowmo(
 			log.info(`Cleaned up temporary file: ${tempPath}`);
 		} catch (cleanupError) {
 			// Don't fail the whole operation if cleanup fails
-			log.warn(`Failed to clean up temporary file ${tempPath}: ${cleanupError}`);
+			log.warn(
+				`Failed to clean up temporary file ${tempPath}: ${cleanupError}`,
+			);
 		}
 
 		return resultFilePath;
