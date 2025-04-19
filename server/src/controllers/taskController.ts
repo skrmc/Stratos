@@ -10,6 +10,8 @@ import log from "../config/logger.js";
 import type { TaskFileDownloadInfo } from "../types/index.js";
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../types/index.js";
 import { validate as validateUUID } from "uuid";
+import { eventService } from "../services/eventService.js";
+import { streamSSE } from "hono/streaming";
 
 export const taskController = {
 	submitCommand: async (c: Context) => {
@@ -283,7 +285,103 @@ export const taskController = {
 			return c.json({ error: "Failed to fetch tasks" }, 500);
 		}
 	},
+	streamTaskProgress: async (c: Context) => {
+		const taskId = c.req.param("id");
+
+		if (!validateUUID(taskId)) {
+			return c.json({ error: "Invalid task ID" }, 400);
+		}
+
+		// Check if task exists
+		const task = await taskService.getTask(taskId);
+		if (!task) {
+			return c.json({ error: "Task not found" }, 404);
+		}
+
+		c.header("Content-Type", "text/event-stream");
+		c.header("Cache-Control", "no-cache");
+		c.header("Connection", "keep-alive");
+
+		return streamSSE(c, async (stream) => {
+			let closed = false;
+			let resolveKeeper!: () => void;
+			const keepAlive = new Promise<void>((resolve) => {
+				resolveKeeper = resolve;
+			});
+
+			await stream.writeSSE({
+				event: "status",
+				data: JSON.stringify({
+					id: taskId,
+					status: "pending",
+				}),
+			});
+
+			const heartbeat = setInterval(() => {
+				if (!closed) {
+					stream.writeSSE({ event: "heartbeat", data: String(Date.now()) });
+				}
+			}, 5000);
+
+			const cleanup = () => {
+				if (!closed) {
+					closed = true;
+					clearInterval(heartbeat);
+					progressCleanup();
+					completeCleanup();
+					failedCleanup();
+					resolveKeeper();
+				}
+			};
+
+			stream.onAbort = cleanup;
+
+			const progressCleanup = eventService.onTaskEvent(
+				taskId,
+				"progress",
+				async (data) => {
+					if (!closed) {
+						await stream.writeSSE({
+							event: "progress",
+							data: JSON.stringify(data),
+						});
+					}
+				},
+			);
+			const completeCleanup = eventService.onTaskEvent(
+				taskId,
+				"complete",
+				async (data) => {
+					if (!closed) {
+						await stream.writeSSE({
+							event: "complete",
+							data: JSON.stringify(data),
+						});
+						cleanup();
+						stream.close();
+					}
+				},
+			);
+			const failedCleanup = eventService.onTaskEvent(
+				taskId,
+				"failed",
+				async (err) => {
+					if (!closed) {
+						await stream.writeSSE({
+							event: "error",
+							data: JSON.stringify({ error: err }),
+						});
+						cleanup();
+						stream.close();
+					}
+				},
+			);
+
+			await keepAlive;
+		});
+	},
 };
+
 /**
  * Helper function to handle AI command submission
  */
