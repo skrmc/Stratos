@@ -183,8 +183,8 @@ export const previewService = {
 	): Promise<void> => {
 		// Size-based settings
 		let crf;
-    let scale; 
-    let trimDuration;
+		let scale;
+		let trimDuration;
 
 		// Get video duration (still useful for trimming)
 		let duration = null;
@@ -207,7 +207,7 @@ export const previewService = {
 			await fs.copyFile(inputPath, outputPath);
 			return;
 		}
-    if (fileSize <= 50 * 1024 * 1024) {
+		if (fileSize <= 50 * 1024 * 1024) {
 			// 5MB - 50MB: Light compression
 			crf = 23;
 			scale = "scale=1280:-2";

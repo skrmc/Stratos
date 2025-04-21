@@ -428,8 +428,10 @@ export const taskController = {
 				// Handle range requests for video streaming
 				const rangeHeader = c.req.header("range");
 
-				if (rangeHeader && (mimeType.startsWith("video/") || mimeType.startsWith("audio/")))
-				{
+				if (
+					rangeHeader &&
+					(mimeType.startsWith("video/") || mimeType.startsWith("audio/"))
+				) {
 					// Parse range header
 					const range = rangeHeader.replace(/bytes=/, "").split("-");
 					const start = Number.parseInt(range[0], 10);
@@ -444,17 +446,14 @@ export const taskController = {
 
 					const fileStream = Bun.file(previewPath).stream();
 					return c.body(fileStream);
-				} 
+				}
 				// For non-range requests or non-video files
 				c.header("Content-Length", stats.size.toString());
 				c.header("Content-Type", mimeType);
 
 				// For downloads, use attachment disposition
 				if (c.req.query("download") === "true") {
-					c.header(
-						"Content-Disposition",
-						`attachment; filename="${fileName}"`,
-					);
+					c.header("Content-Disposition", `attachment; filename="${fileName}"`);
 				} else {
 					c.header("Content-Disposition", `inline; filename="${fileName}"`);
 				}
@@ -462,7 +461,6 @@ export const taskController = {
 				// Stream the file
 				const fileBuffer = await Bun.file(previewPath).arrayBuffer();
 				return c.body(fileBuffer);
-				
 			}
 
 			// preview isn't available but the task is completed,
@@ -485,7 +483,7 @@ export const taskController = {
 					// return c.body(fileBuffer);
 					const fileStream = Bun.file(filePath).stream();
 					return c.body(fileStream);
-				} 
+				}
 				// and return a status message
 				previewService
 					.generatePreview(taskId)
@@ -503,7 +501,6 @@ export const taskController = {
 					},
 					202,
 				);
-				
 			}
 
 			// No preview or original available
