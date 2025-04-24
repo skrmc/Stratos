@@ -326,7 +326,7 @@ export const taskController = {
 			await stream.writeSSE({
 				event: "heartbeat",
 				data: String(Date.now()),
-			});			
+			});
 
 			const heartbeat = setInterval(() => {
 				if (!closed) {
