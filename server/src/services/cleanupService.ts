@@ -28,7 +28,7 @@ export const cleanupService = {
 					// Delete file from filesystem
 					await fs.unlink(file.file_path);
 					log.info(`Deleted file from filesystem: ${file.file_path}`);
-					
+
 					//Delete thumbnail from database
 					await thumbnailUtils.deleteThumbnail(file.id);
 

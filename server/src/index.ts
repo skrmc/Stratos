@@ -18,15 +18,18 @@ const app = new Hono();
 //Middleware
 app.use("*", cors());
 
-const thumbsDir = path.resolve(UPLOAD_CONFIG.DIR, 'thumbnails');
+const thumbsDir = path.resolve(UPLOAD_CONFIG.DIR, "thumbnails");
 
-app.use('/thumbnails/*', serveStatic({
-	root: thumbsDir,
-	rewriteRequestPath: (reqPath) => {
-	  // strip leading `/thumbnails`
-	  return reqPath.replace(/^\/thumbnails/, '');
-	}
-  }));
+app.use(
+	"/thumbnails/*",
+	serveStatic({
+		root: thumbsDir,
+		rewriteRequestPath: (reqPath) => {
+			// strip leading `/thumbnails`
+			return reqPath.replace(/^\/thumbnails/, "");
+		},
+	}),
+);
 
 const api = new Hono();
 //Routes
