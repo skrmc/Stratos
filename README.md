@@ -54,9 +54,7 @@ Stratos is a modern, client-server separated solution for video editing, built w
 
 ### Frontend
 - **Framework**: [Svelte](https://svelte.dev/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Build Tool**: [Vite](https://vitejs.dev/)
-- **Styling**: Modern CSS with [Tailwind CSS](https://tailwindcss.com/) (optional)
 
 ### Backend
 - **Runtime**: [Bun](https://bun.sh/)
@@ -72,7 +70,7 @@ Stratos is a modern, client-server separated solution for video editing, built w
 
 ```
 Stratos/
-├── server/           # Backend server code
+├── server/          # Backend server code
 │   ├── src/         # Source code
 │   ├── test/        # Test files
 │   └── docs/        # Documentation
@@ -113,7 +111,7 @@ Stratos provides a RESTful API that allows developers to integrate with the plat
 ### Prerequisites
 
 - [Bun](https://bun.sh/) (recommended) or [Node.js](https://nodejs.org/)
-- [Docker](https://www.docker.com/) (optional, for containerized deployment)
+- [Docker](https://www.docker.com/) (recommended for deployment)
 - [Git](https://git-scm.com/)
 
 ### Installation
