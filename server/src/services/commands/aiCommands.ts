@@ -22,8 +22,8 @@ export const AI_COMMANDS: Record<string, AICommandDefinition> = {
 			},
 		],
 	},
-	slowmo: {
-		name: "slowmo",
+	slowmotion: {
+		name: "slowmotion",
 		description: "Create a slow motion version of a video",
 		options: [
 			{
@@ -31,6 +31,19 @@ export const AI_COMMANDS: Record<string, AICommandDefinition> = {
 				description: "Speed factor (0.1 to 0.5, where 0.5 is half speed)",
 				type: "number",
 				default: 0.5,
+			},
+		],
+	},
+	fpsboost: {
+		name: "fpsboost",
+		description: "Increase the frame rate of a video",
+		options: [
+			{
+				name: "factor",
+				description: "Frame rate increase factor (2 for double the fps)",
+
+				type: "number",
+				default: 2,
 			},
 		],
 	},
