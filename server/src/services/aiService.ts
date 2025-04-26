@@ -288,7 +288,9 @@ async function processFpsBoost(
 
 		return resultFilePath;
 	} catch (error) {
-		log.error(`Failed to get frame rate booster video from AI service: ${error}`);
+		log.error(
+			`Failed to get frame rate booster video from AI service: ${error}`,
+		);
 		throw new Error(`Frame Rate Boost service error: ${error}`);
 	}
 }
