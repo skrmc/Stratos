@@ -12,7 +12,9 @@ export const thumbnailUtils = {
 	getDirectory: (baseConfig: typeof UPLOAD_CONFIG | typeof OUTPUT_CONFIG) => {
 		return path.join(baseConfig.DIR, THUMBNAIL_DIR_NAME);
 	},
-	ensureDirectory: async (baseConfig: typeof UPLOAD_CONFIG | typeof OUTPUT_CONFIG) => {
+	ensureDirectory: async (
+		baseConfig: typeof UPLOAD_CONFIG | typeof OUTPUT_CONFIG,
+	) => {
 		try {
 			const dir = thumbnailUtils.getDirectory(baseConfig);
 			await fs.mkdir(dir, { recursive: true, mode: baseConfig.PERMISSIONS });
@@ -42,7 +44,7 @@ export const thumbnailUtils = {
 		filePath: string,
 		id: string,
 		fileType: string,
-		baseConfig: typeof UPLOAD_CONFIG | typeof OUTPUT_CONFIG
+		baseConfig: typeof UPLOAD_CONFIG | typeof OUTPUT_CONFIG,
 	): Promise<string | null> => {
 		try {
 			await thumbnailUtils.ensureDirectory(baseConfig);
@@ -53,11 +55,15 @@ export const thumbnailUtils = {
 			);
 
 			if (fileType.startsWith("image/")) {
-				await execAsync(`ffmpeg -y -i "${filePath}" -vframes 1 "${outputPath}"`);
+				await execAsync(
+					`ffmpeg -y -i "${filePath}" -vframes 1 "${outputPath}"`,
+				);
 			} else if (fileType.startsWith("video/")) {
 				const seekTime = await (async () => {
 					try {
-						const { stdout } = await execAsync(`ffprobe -v error -show_entries format=duration -of csv=p=0 "${filePath}"`);
+						const { stdout } = await execAsync(
+							`ffprobe -v error -show_entries format=duration -of csv=p=0 "${filePath}"`,
+						);
 						const duration = Number.parseFloat(stdout.trim());
 						return duration > 0 ? duration / 2 : 1;
 					} catch {
@@ -65,7 +71,9 @@ export const thumbnailUtils = {
 					}
 				})();
 
-				await execAsync(`ffmpeg -y -i "${filePath}" -ss ${seekTime} -vframes 1 "${outputPath}"`);
+				await execAsync(
+					`ffmpeg -y -i "${filePath}" -ss ${seekTime} -vframes 1 "${outputPath}"`,
+				);
 			} else {
 				return null;
 			}
@@ -78,7 +86,10 @@ export const thumbnailUtils = {
 			return null;
 		}
 	},
-	delete: async (id: string, baseConfig: typeof UPLOAD_CONFIG | typeof OUTPUT_CONFIG): Promise<void> => {
+	delete: async (
+		id: string,
+		baseConfig: typeof UPLOAD_CONFIG | typeof OUTPUT_CONFIG,
+	): Promise<void> => {
 		try {
 			const outputPath = path.join(
 				thumbnailUtils.getDirectory(baseConfig),
