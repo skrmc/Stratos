@@ -20,12 +20,12 @@ export const counter = writable<{
 export const fileSelected = writable<number>(-1)
 export const taskSelected = writable<number>(-1)
 export const command = writable<string>('')
-export const showConfigModal = writable<boolean>(false)
-export const currentTab = writable<string>('files')
+export const currentTab = writable<string>('Files')
 export const userInfo = writable<UserInfo | null>(null)
 
 export const token = persist<string>('token', '')
 export const endpoint = persist<string>('endpoint', '/api')
+export const maxBlobSize = persist<number>('maxBlobSize', 10000000)
 
 export const slashCommands: string[] = [
 	'extract-audio',

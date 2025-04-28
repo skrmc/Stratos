@@ -18,7 +18,7 @@ import type {
 } from "../types/index.js";
 import { eventService } from "./eventService.js";
 import { getContentType } from "../utils/fileUtils.js";
-import { previewService } from "./previewService.js";
+import { thumbnailUtils } from "../utils/thumbnailUtils.js";
 
 const execAsync = promisify(exec);
 
@@ -106,8 +106,6 @@ export const taskService = {
 			status: row.status,
 			created_at: row.created_at,
 			updated_at: row.updated_at,
-			result_path: row.result_path,
-			error: row.error,
 			user_id: row.user_id,
 		};
 
@@ -197,7 +195,7 @@ export const taskService = {
 					const match = progressRegex.exec(output);
 					if (match) {
 						const timeStr = match[1];
-						log.info(`Progress match found for task ${taskId}: ${timeStr}`);
+						log.debug(`Progress match found for task ${taskId}: ${timeStr}`);
 						// Convert HH:MM:SS.MS to seconds
 						const timeParts = timeStr.split(":");
 						const seconds =
@@ -216,7 +214,7 @@ export const taskService = {
 							currentTime: seconds,
 							totalDuration: duration,
 						});
-						log.info(
+						log.debug(
 							`Progress event emitted for task ${taskId}: ${progress * 100}%`,
 						);
 					}
@@ -228,23 +226,32 @@ export const taskService = {
 				process.on("close", async (code) => {
 					try {
 						if (code === 0) {
-							// Find output file(s)
 							const outputFiles = await fs.readdir(outputDir);
+
 							const resultPath =
 								outputFiles.length > 0
 									? path.join(outputDir, outputFiles[0])
 									: null;
 
-							// Update task as completed
-							await sql`
-              UPDATE tasks 
-              SET status = 'completed', 
-                  result_path = ${resultPath}, 
-                  updated_at = NOW() 
-              WHERE id = ${taskId}
-            `;
+							let resultSize: number | null = null;
 
-							// Emit completion event
+							if (resultPath) {
+								try {
+									const stats = await fs.stat(resultPath);
+									resultSize = stats.size;
+								} catch (error) {
+									log.warn(`Failed to get file size for ${resultPath}`, error);
+								}
+							}
+							await sql`
+								UPDATE tasks 
+								SET status = 'completed',
+									result_path = ${resultPath},
+									result_size = ${resultSize},
+									updated_at = NOW()
+								WHERE id = ${taskId}
+							`;
+
 							eventService.emitTaskComplete(taskId, {
 								taskId,
 								status: "completed",
@@ -255,33 +262,39 @@ export const taskService = {
 								})),
 							});
 
-							// Trigger preview generation if there's a result file
-							if (resultPath) {
-								// Don't await - let it run in background
-								previewService
-									.generatePreview(taskId)
-									.catch((err) =>
-										log.error(`Preview generation failed for ${taskId}:`, err),
-									);
-							}
+							await taskService.getTaskFiles(taskId).then(async (info) => {
+								if (info.single) {
+									await thumbnailUtils
+										.generate(
+											info.single.path,
+											taskId,
+											info.single.mime_type,
+											OUTPUT_CONFIG,
+										)
+										.catch((err) => {
+											log.error(
+												`Preview generation failed for task ${taskId}:`,
+												err,
+											);
+										});
+								}
+							});
+
 							log.info(`Task ${taskId} completed successfully`);
 							resolve();
 						} else {
 							const error = `Process exited with code ${code}`;
 							log.error(`Error executing task ${taskId}: ${error}`);
 
-							// Update task as failed
 							await sql`
-              UPDATE tasks 
-              SET status = 'failed', 
-                  error = ${error}, 
-                  updated_at = NOW() 
-              WHERE id = ${taskId}
-            `;
+								UPDATE tasks 
+								SET status = 'failed', 
+									error = ${error}, 
+									updated_at = NOW()
+								WHERE id = ${taskId}
+							`;
 
-							// Emit failure event
 							eventService.emitTaskFailed(taskId, error);
-
 							reject(new Error(error));
 						}
 					} catch (processError) {
@@ -292,23 +305,19 @@ export const taskService = {
 					}
 				});
 
-				// Handle process errors
 				process.on("error", async (err) => {
 					const errorMessage = `Process error: ${err.message}`;
 					log.error(`Error executing task ${taskId}: ${errorMessage}`);
 
-					// Update task as failed
 					await sql`
-          UPDATE tasks 
-          SET status = 'failed', 
-              error = ${errorMessage}, 
-              updated_at = NOW() 
-          WHERE id = ${taskId}
-        `;
+						UPDATE tasks 
+						SET status = 'failed', 
+							error = ${errorMessage}, 
+							updated_at = NOW()
+						WHERE id = ${taskId}
+					`;
 
-					// Emit failure event
 					eventService.emitTaskFailed(taskId, errorMessage);
-
 					reject(err);
 				});
 			});
@@ -343,6 +352,7 @@ export const taskService = {
 			created_at: row.created_at,
 			updated_at: row.updated_at,
 			result_path: row.result_path,
+			result_size: row.result_size,
 			error: row.error,
 			user_id: row.user_id,
 		};
@@ -422,7 +432,7 @@ export const taskService = {
 		try {
 			// check if task exists and get its details
 			const [task] = await sql`
-			SELECT id, result_path, preview_path
+			SELECT id, result_path
 			FROM tasks 
 			WHERE id = ${taskId}
 		  `;
@@ -438,6 +448,8 @@ export const taskService = {
 			} catch (error) {
 				log.warn(`Error deleting output directory for task ${taskId}:`, error);
 			}
+
+			await thumbnailUtils.delete(taskId, OUTPUT_CONFIG);
 
 			// Delete related records and task from database in a transaction
 			await sql.begin(async (sql) => {
@@ -471,6 +483,7 @@ export const taskService = {
 				t.created_at, 
 				t.updated_at, 
 				t.result_path, 
+				t.result_size,
 				t.error,
 				t.user_id,
 				array_agg(tf.file_id) as file_ids
@@ -531,6 +544,7 @@ export const taskService = {
 			created_at: row.created_at,
 			updated_at: row.updated_at,
 			result_path: row.result_path,
+			result_size: row.result_size,
 			error: row.error,
 			user_id: row.user_id,
 			fileIds: row.file_ids.filter((id: string | null) => id), // Filter out null values

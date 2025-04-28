@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import sql from "../config/database.js";
 import log from "../config/logger.js";
-import { OUTPUT_CONFIG } from "../types/index.js";
+import { OUTPUT_CONFIG, UPLOAD_CONFIG } from "../types/index.js";
 import { thumbnailUtils } from "../utils/thumbnailUtils.js";
 
 export const cleanupService = {
@@ -15,10 +15,10 @@ export const cleanupService = {
 
 			// Get all expired files
 			const expiredFiles = await sql<{ id: string; file_path: string }[]>`
-				SELECT id, file_path
-				FROM files
-				WHERE expires_at < CURRENT_TIMESTAMP
-			`;
+        SELECT id, file_path
+        FROM files
+        WHERE expires_at < CURRENT_TIMESTAMP
+      `;
 
 			log.info(`Found ${expiredFiles.length} expired files to clean up`);
 
@@ -29,8 +29,8 @@ export const cleanupService = {
 					await fs.unlink(file.file_path);
 					log.info(`Deleted file from filesystem: ${file.file_path}`);
 
-					//Delete thumbnail from database
-					await thumbnailUtils.deleteThumbnail(file.id);
+					// Delete thumbnail
+					await thumbnailUtils.delete(file.id, UPLOAD_CONFIG);
 
 					// Delete from database (this will cascade to task_files)
 					await sql`DELETE FROM files WHERE id = ${file.id}`;
@@ -41,47 +41,34 @@ export const cleanupService = {
 			}
 
 			// Get expired tasks (those without associated files or explicitly expired)
-			const expiredTasks = await sql<
-				{ id: string; result_path: string; preview_path: string }[]
-			>`
-  SELECT id, result_path, preview_path
-  FROM tasks
-  WHERE expires_at < CURRENT_TIMESTAMP
-  AND NOT EXISTS (
-    SELECT 1 FROM task_files WHERE task_id = tasks.id
-  )
-`;
+			const expiredTasks = await sql<{ id: string; result_path: string }[]>`
+        SELECT id, result_path
+        FROM tasks
+        WHERE expires_at < CURRENT_TIMESTAMP
+        AND NOT EXISTS (
+          SELECT 1 FROM task_files WHERE task_id = tasks.id
+        )
+      `;
 			log.info(`Found ${expiredTasks.length} expired tasks to clean up`);
 
-			// Delete task output directories
+			// Delete task output directories and thumbnails
 			for (const task of expiredTasks) {
 				try {
-					// if (task.result_path) {
-					// 	// Get the task directory (parent of result file)
-					// 	const taskDir = path.dirname(task.result_path);
-
-					// 	// Only delete if it's under our outputs directory (safety check)
-					// 	if (taskDir.startsWith(OUTPUT_CONFIG.DIR)) {
-					// 		// Delete the entire task directory and its contents
-					// 		await fs.rm(taskDir, { recursive: true, force: true });
-					// 		log.info(`Deleted task output directory: ${taskDir}`);
-					// 	}
-					// }
-					// DELETE IF THE FOLLOWING WORKS
 					const taskDir = path.join(OUTPUT_CONFIG.DIR, task.id);
 
-					// Check if directory exists and is under our outputs directory
-					if (
-						await fs
-							.access(taskDir)
-							.then(() => true)
-							.catch(() => false)
-					) {
-						if (taskDir.startsWith(OUTPUT_CONFIG.DIR)) {
-							await fs.rm(taskDir, { recursive: true, force: true });
-							log.info(`Deleted task output directory: ${taskDir}`);
-						}
+					// Check if task directory exists
+					const taskDirExists = await fs
+						.access(taskDir)
+						.then(() => true)
+						.catch(() => false);
+
+					if (taskDirExists && taskDir.startsWith(OUTPUT_CONFIG.DIR)) {
+						await fs.rm(taskDir, { recursive: true, force: true });
+						log.info(`Deleted task output directory: ${taskDir}`);
 					}
+
+					// Delete associated thumbnail
+					await thumbnailUtils.delete(task.id, OUTPUT_CONFIG);
 
 					// Delete from database
 					await sql`DELETE FROM tasks WHERE id = ${task.id}`;
@@ -102,7 +89,7 @@ export const cleanupService = {
 	 * Schedule the cleanup job to run periodically
 	 */
 	scheduleCleanupJob: (intervalSeconds: number): NodeJS.Timeout => {
-		log.info(`Scheduling cleanup job to run every ${intervalSeconds} minutes`);
+		log.info(`Scheduling cleanup job to run every ${intervalSeconds} seconds`);
 
 		// Run immediately on startup
 		cleanupService.cleanupExpiredFiles().catch((err) => {
