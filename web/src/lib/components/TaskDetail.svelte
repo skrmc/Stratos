@@ -70,15 +70,12 @@
 	)
 
 	$effect(() => {
-	$task.id;
+		$task.id
 
-		if (
-			$task.result_size !== undefined &&
-			$task.result_size >= $maxBlobSize
-		) {
-			showToast('File too large. Adjust <b>Preview Settings</b> or download instead.', 'info');
+		if ($task.result_size !== undefined && $task.result_size >= $maxBlobSize) {
+			showToast('File too large. Adjust <b>Preview Settings</b> or download instead.', 'info')
 		}
-	});
+	})
 
 	onDestroy(() => {
 		if (mediaUrl) URL.revokeObjectURL(mediaUrl)
