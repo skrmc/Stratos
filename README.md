@@ -21,6 +21,7 @@
 ## 📑 Table of Contents
 
 - [📋 Overview](#-overview)
+- [🎮 Demo](#-demo)
 - [🚀 Features](#-features)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🏗️ Project Structure](#️-project-structure)
@@ -37,6 +38,13 @@
 ## 📋 Overview
 
 Stratos is a modern, client-server separated solution for video editing, built with cutting-edge technologies to provide a seamless editing experience. The platform is designed with scalability and performance in mind, offering a robust foundation for video processing and editing workflows.
+
+## 🎮 Demo
+
+See Stratos in action with our command interface:
+
+![DEMO](https://github.com/user-attachments/assets/d52d7b5e-f178-427d-b374-f98c2cebf73c)
+
 
 ## 🚀 Features
 
