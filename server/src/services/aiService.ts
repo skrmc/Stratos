@@ -166,7 +166,9 @@ async function processTranscription(
 			progress: 0.2,
 			message: "Starting transcription...",
 		});
-		const response = await axios.post(`${AI_URL}/transcribe/${safeFilePath}/${optionsString}`);
+		const response = await axios.post(
+			`${AI_URL}/transcribe/${safeFilePath}/${optionsString}`,
+		);
 
 		eventService.emitTaskProgress(taskId, {
 			taskId,
@@ -255,7 +257,9 @@ async function processSlowmo(
 		});
 
 		// Start the slow motion processing
-		const response = await axios.post(`${AI_URL}/slowmo/${safeFilePath}/${optionsString}`);
+		const response = await axios.post(
+			`${AI_URL}/slowmo/${safeFilePath}/${optionsString}`,
+		);
 
 		eventService.emitTaskProgress(taskId, {
 			taskId,
@@ -339,7 +343,9 @@ async function processFpsBoost(
 		});
 
 		// Start the frame rate boost processing
-		const response = await axios.post(`${AI_URL}/fpsboost/${safeFilePath}/${optionsString}`);
+		const response = await axios.post(
+			`${AI_URL}/fpsboost/${safeFilePath}/${optionsString}`,
+		);
 
 		eventService.emitTaskProgress(taskId, {
 			taskId,
