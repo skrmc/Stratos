@@ -1,3 +1,4 @@
+// lib/types.ts
 import type { Writable } from 'svelte/store'
 
 export type UserInfo = {
@@ -21,6 +22,7 @@ export type FileItem = {
 export type TaskItem = {
 	id: string
 	status: string
+	command: string
 	created_at: string
 	updated_at?: string
 	result_path?: string
