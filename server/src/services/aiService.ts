@@ -420,7 +420,10 @@ async function processAiSubtitle(
 			message: "Applying subtitles to video...",
 		});
 		// Replace .srt with .ass
-		const transcriptionResultAss = transcriptionResult.replace(/\.srt$/,".ass");
+		const transcriptionResultAss = transcriptionResult.replace(
+			/\.srt$/,
+			".ass",
+		);
 		// create a new file with .en.srt
 		await execAsync(
 			`ffmpeg -i ${transcriptionResult} ${transcriptionResultAss}`,
