@@ -1,39 +1,48 @@
-# 🎬 Stratos
-
 <div align="center">
   <!-- Add your project logo here when available -->
-  <!-- <img src="docs/logo.png" alt="Stratos Logo" width="200"/> -->
+  <img src="docs/logo.png" alt="Stratos Logo" width="800"/>
 
   [![Build Status](https://github.com/StratosIO/Stratos/actions/workflows/build.yml/badge.svg)](https://github.com/StratosIO/Stratos/actions)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/StratosIO/Stratos/blob/master/LICENSE)
   [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat&logo=python&logoColor=white)
   [![Svelte](https://img.shields.io/badge/Svelte-FF3E00?style=flat&logo=svelte&logoColor=white)](https://svelte.dev/)
   [![Bun](https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white)](https://bun.sh/)
   [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+  ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/StratosIO/Stratos)
   [![GitHub Stars](https://img.shields.io/github/stars/StratosIO/Stratos?style=social)](https://github.com/StratosIO/Stratos/stargazers)
   [![GitHub Forks](https://img.shields.io/github/forks/StratosIO/Stratos?style=social)](https://github.com/StratosIO/Stratos/network/members)
 
 </div>
+
+# 🎬 Stratos
 
 > **⚠️ Development Status**  
 > Stratos is currently in active development. We're working hard to bring you a powerful video editing solution. Features and APIs are subject to change as we refine the platform.
 
 ## 📑 Table of Contents
 
-- [📋 Overview](#-overview)
-- [🎮 Demo](#-demo)
-- [🚀 Features](#-features)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🏗️ Project Structure](#️-project-structure)
-- [📘 Documentation](#-Documentation)
-- [🏁 Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Docker Deployment](#docker-deployment)
-- [📝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [🤝 Support](#-support)
-- [👥 Contributors](#-contributors)
+- [🎬 Stratos](#-stratos)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [📋 Overview](#-overview)
+  - [🎮 Demo](#-demo)
+  - [🚀 Features](#-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Development Tools](#development-tools)
+  - [🏗️ Project Structure](#️-project-structure)
+  - [📘 Documentation](#-documentation)
+    - [User Manual](#user-manual)
+    - [API Documentation](#api-documentation)
+  - [🏁 Getting Started](#-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Docker Deployment](#docker-deployment)
+    - [Commit Guidelines](#commit-guidelines)
+  - [📄 License](#-license)
+  - [🤝 Support](#-support)
+  - [👥 Contributors](#-contributors)
 
 ## 📋 Overview
 
