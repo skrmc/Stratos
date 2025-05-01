@@ -188,7 +188,7 @@
 				text += el.dataset.mentionId || el.textContent
 			}
 		}
-		return text
+		return text.replace(/\u00A0/g, '\u0020')
 	}
 
 	function insertSpanAtTrigger(
@@ -248,7 +248,7 @@
 	}
 </script>
 
-<div class="form-control relative font-mono">
+<div class="form-control relative cursor-text font-mono">
 	<div
 		contenteditable="plaintext-only"
 		bind:this={inputElement}
