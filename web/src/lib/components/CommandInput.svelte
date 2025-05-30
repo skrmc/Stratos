@@ -161,7 +161,7 @@
 			if (!response.ok) {
 				showToast(`Failed to send: ${cmd}`, 'error')
 				currentTab.set('Settings')
-				break
+				return
 			}
 
 			const { success, task } = await response.json()
