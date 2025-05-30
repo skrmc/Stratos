@@ -14,7 +14,7 @@
 		{#if progress !== undefined}
 			<div
 				class="bg-info/10 rounded-field absolute inset-0 h-full transition-all duration-200"
-				style="width: {10 + progress * 0.9}%;"
+				style="width: {progress === 0 ? 0 : 10 + progress * 0.9}%;"
 				class:opacity-100={progress < 100}
 				class:opacity-0={progress === 100}
 			></div>
